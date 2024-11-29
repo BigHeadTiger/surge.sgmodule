@@ -1,3 +1,7 @@
+#!name=Talkatone
+#!desc=Talkatone 代理规则模块，使 Talkatone APP 不再对不同代理节点过于敏感
+# 本模块主要为 Talkatone 进行策略分流，以解决使用某些节点无法直接使用 Talkatone 的问题。本模块仅适用于 Talkatone 登陆后使用，不适用于软件注册。
+
 [Rule]
 # 以下为该软件部分去广告规则
 DOMAIN-SUFFIX,ads.inmobi.com,REJECT-DROP
