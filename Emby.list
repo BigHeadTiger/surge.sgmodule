@@ -1,0 +1,7 @@
+# NAME: Emby
+# Emby 官方域名分流规则
+HOST-SUFFIX,emby.media,Emby
+HOST-SUFFIX,embyapp.com,Emby
+HOST-SUFFIX,emby.wiki,Emby
+# 自定义 Emby 服务器分流规则
+HOST,emby.emby3.misakaf.org,Emby
