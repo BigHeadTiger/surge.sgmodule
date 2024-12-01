@@ -11,9 +11,9 @@ talkatone_ads_ui_cleanup = type=http-response, pattern=https?:\/\/.*\.talkatone\
 [URL Rewrite]
 # 动态广告路径拦截
 ^https?:\/\/.*\.talkatone\.com\/ad.*$ reject
-^https?:\/\/.*\.googleusercontent\.com\/talkatone_ads.*$ reject
-^https?:\/\/.*\.firebaseio\.com\/ad_requests.*$ reject
-^https?:\/\/.*\.doubleclick\.net\/pagead\/ads.*$ reject
+^https?:\/\/.*\.googleusercontent\.com\/talkatone_ads.*$ - reject
+^https?:\/\/.*\.firebaseio\.com\/ad_requests.*$ - reject
+^https?:\/\/.*\.doubleclick\.net\/pagead\/ads.*$ - reject
 
 [Rule]
 # 以下为该软件部分去广告规则
@@ -48,5 +48,5 @@ IP-CIDR,205.164.56.0/24,DIRECT,no-resolve
 IP-CIDR,63.251.124.0/24,DIRECT,no-resolve
 
 [MITM]
-hostname = *.talkatone.com
+hostname = %APPEND% *.talkatone.com
 
