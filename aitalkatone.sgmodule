@@ -1,0 +1,33 @@
+[General]
+loglevel = notify
+
+[Rule]
+# 广告域名拦截（立即拒绝）
+DOMAIN-SUFFIX:pubads.g.doubleclick.net, REJECT
+DOMAIN-SUFFIX:googleads.g.doubleclick.net, REJECT
+DOMAIN-SUFFIX:ads-talkatone.appspot.com, REJECT
+DOMAIN-SUFFIX:talkatone-adservice.com, REJECT
+DOMAIN-SUFFIX:googlesyndication.com, REJECT
+DOMAIN-SUFFIX:pagead2.googlesyndication.com, REJECT
+DOMAIN-SUFFIX:amazon-adsystem.com, REJECT
+DOMAIN-SUFFIX:adsafeprotected.com, REJECT
+DOMAIN-SUFFIX:moatads.com, REJECT
+
+# 数据跟踪域名拦截（静默丢弃）
+DOMAIN-SUFFIX:app-measurement.com, REJECT-DROP
+DOMAIN-SUFFIX:google-analytics.com, REJECT-DROP
+DOMAIN-SUFFIX:crashlytics.com, REJECT-DROP
+DOMAIN-SUFFIX:firebase-settings.crashlytics.com, REJECT-DROP
+DOMAIN-SUFFIX:analytics.talkatone.com, REJECT-DROP
+DOMAIN-SUFFIX:events.appsflyer.com, REJECT-DROP
+DOMAIN-SUFFIX:adjust.com, REJECT-DROP
+DOMAIN-SUFFIX:graph.facebook.com, REJECT-DROP
+DOMAIN-SUFFIX:doubleverify.com, REJECT-DROP
+DOMAIN-SUFFIX:mobileanalytics.us-east-1.amazonaws.com, REJECT-DROP
+
+[URL Rewrite]
+# 动态广告路径拦截
+^https?:\/\/.*\.talkatone\.com\/ad.*$ reject
+^https?:\/\/.*\.googleusercontent\.com\/talkatone_ads.*$ reject
+^https?:\/\/.*\.firebaseio\.com\/ad_requests.*$ reject
+^https?:\/\/.*\.doubleclick\.net\/pagead\/ads.*$ reject
