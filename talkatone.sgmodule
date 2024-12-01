@@ -4,16 +4,16 @@
 
 [Rule]
 # 以下为该软件部分去广告规则
-DOMAIN-SUFFIX,ads.inmobi.com,REJECT-DROP
-DOMAIN-SUFFIX,tappx.com,REJECT-DROP
-DOMAIN-SUFFIX,criteo.com,REJECT-DROP
-DOMAIN-SUFFIX,pubmatic.com,REJECT-DROP
-DOMAIN-SUFFIX,smaato.net,REJECT-DROP
-DOMAIN-SUFFIX,amazon-adsystem.com,REJECT-DROP
-DOMAIN-SUFFIX,googleads.g.doubleclick.net,REJECT-DROP
-DOMAIN-SUFFIX,adsappier.com,REJECT-DROP
-DOMAIN-SUFFIX,appier.net,REJECT-DROP
-DOMAIN-SUFFIX,appiersig.com,REJECT-DROP
+DOMAIN-SUFFIX,ads.inmobi.com,REJECT
+DOMAIN-SUFFIX,tappx.com,REJECT
+DOMAIN-SUFFIX,criteo.com,REJECT
+DOMAIN-SUFFIX,pubmatic.com,REJECT
+DOMAIN-SUFFIX,smaato.net,REJECT
+DOMAIN-SUFFIX,amazon-adsystem.com,REJECT
+DOMAIN-SUFFIX,googleads.g.doubleclick.net,REJECT
+DOMAIN-SUFFIX,adsappier.com,REJECT
+DOMAIN-SUFFIX,appier.net,REJECT
+DOMAIN-SUFFIX,appiersig.com,REJECT
 
 # 以下为该软件需要走代理的策略组名
 DOMAIN-SUFFIX,tktn.be,Talkatone
