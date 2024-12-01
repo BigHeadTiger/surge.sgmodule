@@ -2,6 +2,12 @@
 #!desc=Talkatone 代理规则模块，已包含分流规则可直接使用
 # 使用时需要surge自行手搓策略组名“Talkatone”，该策略下建议整合“美国”所有节点方便自行切换单个节点
 
+[Script]
+# 屏蔽 Talkatone 广告
+talkatone_ads_block = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\/.*(ads|adunit).*, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/maicoo99/Surge/master/empty.js
+
+talkatone_ads_ui_cleanup = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\/.*(ui\/ad-config|premium-bar).*, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/maicoo99/Surge/master/empty.js
+
 [URL Rewrite]
 # 动态广告路径拦截
 ^https?:\/\/.*\.talkatone\.com\/ad.*$ reject
@@ -40,4 +46,7 @@ IP-CIDR,50.117.27.0/24,DIRECT,no-resolve
 IP-CIDR,69.46.75.0/24,DIRECT,no-resolve
 IP-CIDR,205.164.56.0/24,DIRECT,no-resolve
 IP-CIDR,63.251.124.0/24,DIRECT,no-resolve
+
+[MITM]
+hostname = *.talkatone.com
 
