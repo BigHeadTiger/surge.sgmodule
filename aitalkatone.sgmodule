@@ -46,11 +46,6 @@ DOMAIN-SUFFIX,mobileanalytics.us-east-1.amazonaws.com,REJECT-DROP
 
 # 以下为该软件需要走代理的策略组名
 DOMAIN-SUFFIX,tktn.be,Talkatone
-# 涉及地区限制或国际服务 (PROXY)
-# //测试失败DOMAIN-SUFFIX,talkatone.com,Talkatone
-# //测试失败DOMAIN-SUFFIX,tktn.at,Talkatone
-# //测试失败DOMAIN-SUFFIX,cohere.com,Talkatone
-# //测试失败DOMAIN-SUFFIX,ip-api.com,Talkatone
 
 # 核心功能域名 (DIRECT)
 DOMAIN-SUFFIX,inner-active.mobi,DIRECT
