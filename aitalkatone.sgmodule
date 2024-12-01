@@ -3,6 +3,17 @@
 # 使用时需要surge自行手搓策略组名“Talkatone”，该策略下建议整合“美国”所有节点方便自行切换单个节点
 
 [Rule]
+# talkatone.sgmodule里面的去广告规则
+DOMAIN-SUFFIX,ads.inmobi.com,REJECT
+DOMAIN-SUFFIX,tappx.com,REJECT
+DOMAIN-SUFFIX,criteo.com,REJECT
+DOMAIN-SUFFIX,pubmatic.com,REJECT
+DOMAIN-SUFFIX,smaato.net,REJECT
+DOMAIN-SUFFIX,googleads.g.doubleclick.net,REJECT
+DOMAIN-SUFFIX,adsappier.com,REJECT
+DOMAIN-SUFFIX,appier.net,REJECT
+DOMAIN-SUFFIX,appiersig.com,REJECT
+# ～～以下为ChatGPT生成～～
 # 广告域名 (REJECT)
 DOMAIN-SUFFIX,pubads.g.doubleclick.net,REJECT
 DOMAIN-SUFFIX,googleads.g.doubleclick.net,REJECT
