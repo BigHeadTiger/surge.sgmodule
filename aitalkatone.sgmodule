@@ -40,19 +40,19 @@ DOMAIN-SUFFIX,mobileanalytics.us-east-1.amazonaws.com,REJECT-DROP
 DOMAIN-SUFFIX,tktn.be,Talkatone
 # 涉及地区限制或国际服务 (PROXY)
 DOMAIN-SUFFIX,talkatone.com,Talkatone
-DOMAIN-SUFFIX,tktn.at,Talkatone
-DOMAIN-SUFFIX,cohere.com,Talkatone
-DOMAIN-SUFFIX,ip-api.com,Talkatone
+# //测试失败DOMAIN-SUFFIX,tktn.at,Talkatone
+# //测试失败DOMAIN-SUFFIX,cohere.com,Talkatone
+# //测试失败DOMAIN-SUFFIX,ip-api.com,Talkatone
 
 # 核心功能域名 (DIRECT)
 DOMAIN-SUFFIX,inner-active.mobi,DIRECT
 DOMAIN-SUFFIX,mobilefuse.com,DIRECT
 DOMAIN-SUFFIX,inmobi.com,DIRECT
 DOMAIN-SUFFIX,kochava.com,DIRECT
-# 相同去重:DOMAIN-SUFFIX,cohere.com,DIRECT 
-# 相同去重:DOMAIN-SUFFIX,ip-api.com,DIRECT
+DOMAIN-SUFFIX,cohere.com,DIRECT 
+DOMAIN-SUFFIX,ip-api.com,DIRECT
 DOMAIN-SUFFIX,agkn.com,DIRECT
-# 相同去重:DOMAIN-SUFFIX,tktn.at,DIRECT
+DOMAIN-SUFFIX,tktn.at,DIRECT
 
 # 特定 IP 段 (DIRECT)
 IP-CIDR,50.117.27.0/24,DIRECT,no-resolve
