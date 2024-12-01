@@ -2,6 +2,13 @@
 #!desc=Talkatone 代理规则模块，已包含分流规则可直接使用
 # 使用时需要surge自行手搓策略组名“Talkatone”，该策略下建议整合“美国”所有节点方便自行切换单个节点
 
+[URL Rewrite]
+# 动态广告路径拦截
+^https?:\/\/.*\.talkatone\.com\/ad.*$ reject
+^https?:\/\/.*\.googleusercontent\.com\/talkatone_ads.*$ reject
+^https?:\/\/.*\.firebaseio\.com\/ad_requests.*$ reject
+^https?:\/\/.*\.doubleclick\.net\/pagead\/ads.*$ reject
+
 [Rule]
 # 以下为该软件部分去广告规则
 DOMAIN-SUFFIX,ads.inmobi.com,REJECT
