@@ -1,3 +1,7 @@
+#!name=Talkatone
+#!desc=Talkatone 代理规则模块，已包含分流规则可直接使用
+# 使用时需要surge自行手搓策略组名“Talkatone”，该策略下建议整合“美国”所有节点方便自行切换单个节点
+
 [General]
 loglevel = notify
 
