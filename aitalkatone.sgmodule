@@ -2,9 +2,6 @@
 #!desc=aiTalkatone 代理规则模块，已包含分流规则可直接使用
 # 使用时需要surge自行手搓策略组名“Talkatone”，该策略下建议整合“美国”所有节点方便自行切换单个节点
 
-[General]
-loglevel = notify
-
 [Rule]
 # 广告域名 (REJECT)
 DOMAIN-SUFFIX,pubads.g.doubleclick.net,REJECT
@@ -39,13 +36,14 @@ DOMAIN-SUFFIX,mobileanalytics.us-east-1.amazonaws.com,REJECT-DROP
 # 以下为该软件需要走代理的策略组名
 DOMAIN-SUFFIX,tktn.be,Talkatone
 # 涉及地区限制或国际服务 (PROXY)
-DOMAIN-SUFFIX,talkatone.com,Talkatone
+# //测试失败DOMAIN-SUFFIX,talkatone.com,Talkatone
 # //测试失败DOMAIN-SUFFIX,tktn.at,Talkatone
 # //测试失败DOMAIN-SUFFIX,cohere.com,Talkatone
 # //测试失败DOMAIN-SUFFIX,ip-api.com,Talkatone
 
 # 核心功能域名 (DIRECT)
 DOMAIN-SUFFIX,inner-active.mobi,DIRECT
+DOMAIN-SUFFIX,talkatone.com,DIRECT
 DOMAIN-SUFFIX,mobilefuse.com,DIRECT
 DOMAIN-SUFFIX,inmobi.com,DIRECT
 DOMAIN-SUFFIX,kochava.com,DIRECT
