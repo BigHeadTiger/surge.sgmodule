@@ -37,13 +37,14 @@ DOMAIN-SUFFIX,ads.talkatone.com,REJECT
 DOMAIN-SUFFIX,analytics.talkatone.com,REJECT
 DOMAIN-SUFFIX,track.talkatone.com,REJECT
 DOMAIN-SUFFIX,adserver.talkatone.com,REJECT
+# 以下是“直连”规则广告修改版
 DOMAIN-SUFFIX,inner-active.mobi,REJECT
+DOMAIN-SUFFIX,mobilefuse.com,REJECT
 
 # 以下为该软件需要走代理的策略组名
 DOMAIN-SUFFIX,tktn.be,Talkatone
 
 # 以下为该软件需要走直连的规则
-DOMAIN-SUFFIX,mobilefuse.com,DIRECT
 DOMAIN-SUFFIX,inmobi.com,DIRECT
 DOMAIN-SUFFIX,crashlytics.com,DIRECT
 DOMAIN-SUFFIX,talkatone.com,DIRECT
