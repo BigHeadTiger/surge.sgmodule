@@ -1,5 +1,5 @@
 // talkatone_ad_block.js
-var body = $response.body;
+let body = $response.body;
 
 // 去除顶部广告横幅
 body = body.replace(/<div class=".*?top-banner.*?">.*?<\/div>/g, '');
