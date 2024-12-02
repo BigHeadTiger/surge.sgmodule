@@ -36,7 +36,7 @@ DOMAIN-SUFFIX,telemetry.sdk.inmobi.cn,REJECT
 DOMAIN-SUFFIX,ads.talkatone.com,REJECT
 DOMAIN-SUFFIX,analytics.talkatone.com,REJECT
 DOMAIN-SUFFIX,track.talkatone.com,REJECT
-DOMAIN-SUFFIX,adserver.talkatone.com,RECJET
+DOMAIN-SUFFIX,adserver.talkatone.com,REJECT
 
 # 以下为该软件需要走代理的策略组名
 DOMAIN-SUFFIX,tktn.be,Talkatone
