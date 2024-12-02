@@ -4,13 +4,13 @@
 
 [Script]
 # 移除 Talkatone 广告脚本
-Talkatone_RemoveAds = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\/.*, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/refs/heads/main/talkatone.js, timeout=10, enable=true
+# Talkatone_RemoveAds = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\/.*, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/refs/heads/main/talkatone.js, timeout=10, enable=true
 # 屏蔽 Talkatone 广告
 # talkatone_ads_block = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\/.*(ads|adunit).*, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/maicoo99/Surge/master/empty.js
 
 # talkatone_ads_ui_cleanup = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\/.*(ui\/ad-config|premium-bar).*, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/maicoo99/Surge/master/empty.js
 
-# http-response ^https:\/\/.*\.talkatone\.com\/.* requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/refs/heads/main/talkatone.js
+http-response ^https:\/\/.*\.talkatone\.com\/.* requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/refs/heads/main/talkatone.js
 [URL Rewrite]
 # 动态广告路径拦截
 ^https?:\/\/.*\.talkatone\.com\/ad.*$ reject
@@ -37,12 +37,12 @@ DOMAIN-SUFFIX,ads.talkatone.com,REJECT
 DOMAIN-SUFFIX,analytics.talkatone.com,REJECT
 DOMAIN-SUFFIX,track.talkatone.com,REJECT
 DOMAIN-SUFFIX,adserver.talkatone.com,REJECT
+DOMAIN-SUFFIX,inner-active.mobi,REJECT
 
 # 以下为该软件需要走代理的策略组名
 DOMAIN-SUFFIX,tktn.be,Talkatone
 
 # 以下为该软件需要走直连的规则
-DOMAIN-SUFFIX,inner-active.mobi,DIRECT
 DOMAIN-SUFFIX,mobilefuse.com,DIRECT
 DOMAIN-SUFFIX,inmobi.com,DIRECT
 DOMAIN-SUFFIX,crashlytics.com,DIRECT
