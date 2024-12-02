@@ -27,6 +27,8 @@ DOMAIN-SUFFIX,googleads.g.doubleclick.net,REJECT
 DOMAIN-SUFFIX,adsappier.com,REJECT
 DOMAIN-SUFFIX,appier.net,REJECT
 DOMAIN-SUFFIX,appiersig.com,REJECT
+DOMAIN-SUFFIX,sp.mobidriven.com,REJECT
+DOMAIN-SUFFIX,dsp.appifun.com,REJECT
 
 # 以下为该软件需要走代理的策略组名
 DOMAIN-SUFFIX,tktn.be,Talkatone
