@@ -3,6 +3,8 @@
 # 使用时需要surge自行手搓策略组名“Talkatone”，该策略下建议整合“美国”所有节点方便自行切换单个节点
 
 [Script]
+# 移除 Talkatone 广告脚本
+Talkatone_RemoveAds = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\/.*, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/your-repo/Adblock/main/Talkatone_RemoveAds.js, timeout=10, enable=true
 # 屏蔽 Talkatone 广告
 talkatone_ads_block = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\/.*(ads|adunit).*, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/maicoo99/Surge/master/empty.js
 
