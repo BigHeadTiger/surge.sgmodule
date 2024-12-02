@@ -4,7 +4,7 @@
 
 [Script]
 # 移除 Talkatone 广告脚本
-Talkatone_RemoveAds = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\/.*, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/your-repo/Adblock/main/Talkatone_RemoveAds.js, timeout=10, enable=true
+Talkatone_RemoveAds = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\/.*, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/refs/heads/main/talkatone.js, timeout=10, enable=true
 # 屏蔽 Talkatone 广告
 talkatone_ads_block = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\/.*(ads|adunit).*, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/maicoo99/Surge/master/empty.js
 
