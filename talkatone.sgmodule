@@ -10,7 +10,7 @@ talkatone_ads_block = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\
 
 talkatone_ads_ui_cleanup = type=http-response, pattern=https?:\/\/.*\.talkatone\.com\/.*(ui\/ad-config|premium-bar).*, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/maicoo99/Surge/master/empty.js
 
-http-response ^https:\/\/.*\.talkatone\.com\/.* requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/refs/heads/main/talkatone.js
+# http-response ^https:\/\/.*\.talkatone\.com\/.* requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/refs/heads/main/talkatone.js
 [URL Rewrite]
 # 动态广告路径拦截
 ^https?:\/\/.*\.talkatone\.com\/ad.*$ reject
