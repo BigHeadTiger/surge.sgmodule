@@ -2,13 +2,13 @@
 let body = $response.body;
 
 // 移除顶部广告
-body = body.replace(/<div id="top-banner".*?<\/div>/g, '');
+body = body.replace(/<div id="top-ad-banner".*?<\/div>/g, '');
 
 // 移除中部广告
-body = body.replace(/<div id="middle-banner".*?<\/div>/g, '');
+body = body.replace(/<div id="middle-ad-banner".*?<\/div>/g, '');
 
 // 移除底部广告
-body = body.replace(/<div id="bottom-banner".*?<\/div>/g, '');
+body = body.replace(/<div id="bottom-ad-banner".*?<\/div>/g, '');
 
 // 优化布局
 body = body.replace(/padding-top:.*?;/g, 'padding-top: 0px;'); // 删除顶部空白
