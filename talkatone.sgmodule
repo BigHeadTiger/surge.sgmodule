@@ -38,6 +38,8 @@ DOMAIN-SUFFIX,ads.talkatone.com,REJECT
 DOMAIN-SUFFIX,analytics.talkatone.com,REJECT
 DOMAIN-SUFFIX,track.talkatone.com,REJECT
 DOMAIN-SUFFIX,adserver.talkatone.com,REJECT
+DOMAIN-SUFFIX,doubleclick.net,REJECT
+DOMAIN-SUFFIX,googlesyndication.com,REJECT
 # 以下是“直连”规则广告修改版
 DOMAIN-SUFFIX,inner-active.mobi,REJECT
 DOMAIN-SUFFIX,mobilefuse.com,REJECT
