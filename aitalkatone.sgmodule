@@ -1,67 +1,56 @@
-#!name=aiTalkatone
-#!desc=aiTalkatone 代理规则模块，已包含分流规则可直接使用
-# 使用时需要surge自行手搓策略组名“Talkatone”，该策略下建议整合“美国”所有节点方便自行切换单个节点
+#!name= talkatone
+#!desc= 去广告｜让登录更简单\n\n需要让这个域名代理\nDOMAIN-SUFFIX,tktn.be
+#!author: axin-Under
+#!system= ios
+#!category= axin
+#!date= 2024-05-16 17:12:56
+
+
+
+[Script]
+throttle-rewrite = type=http-response,pattern=^https:\/\/gum\.criteo\.com\/appevent\/v1\/2379\?.*,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/axinhouzilaoyue/myScript/main/surge/throttle-rewrite.js
+
+
+[URL Rewrite]
+# ^https:\/\/aax-fe-sin\.amazon-adsystem\.com\/x\/px\/p\/.+\/\{.+?\} - reject
+# ^https?:\/\/httpdns\.music\.163\.com - reject
+
 
 [Rule]
-# talkatone.sgmodule里面的去广告规则
+# 去广告
 DOMAIN-SUFFIX,ads.inmobi.com,REJECT
 DOMAIN-SUFFIX,tappx.com,REJECT
 DOMAIN-SUFFIX,criteo.com,REJECT
 DOMAIN-SUFFIX,pubmatic.com,REJECT
 DOMAIN-SUFFIX,smaato.net,REJECT
-DOMAIN-SUFFIX,googleads.g.doubleclick.net,REJECT
+DOMAIN-SUFFIX,amazon-adsystem.com,REJECT
+DOMAIN-KEYWORD,googleads,REJECT
 DOMAIN-SUFFIX,adsappier.com,REJECT
 DOMAIN-SUFFIX,appier.net,REJECT
 DOMAIN-SUFFIX,appiersig.com,REJECT
-# ～～以下为ChatGPT生成～～
-# 广告域名 (REJECT)
-DOMAIN-SUFFIX,pubads.g.doubleclick.net,REJECT
-DOMAIN-SUFFIX,googleads.g.doubleclick.net,REJECT
-DOMAIN-SUFFIX,ads-talkatone.appspot.com,REJECT
-DOMAIN-SUFFIX,talkatone-adservice.com,REJECT
-DOMAIN-SUFFIX,googlesyndication.com,REJECT
-DOMAIN-SUFFIX,pagead2.googlesyndication.com,REJECT
-DOMAIN-SUFFIX,amazon-adsystem.com,REJECT
-DOMAIN-SUFFIX,adsafeprotected.com,REJECT
-DOMAIN-SUFFIX,moatads.com,REJECT
 
-# 数据跟踪域名 (REJECT-DROP)
-DOMAIN-SUFFIX,app-measurement.com,REJECT-DROP
-DOMAIN-SUFFIX,google-analytics.com,REJECT-DROP
-DOMAIN-SUFFIX,crashlytics.com,REJECT-DROP
-DOMAIN-SUFFIX,firebase-settings.crashlytics.com,REJECT-DROP
-DOMAIN-SUFFIX,analytics.talkatone.com,REJECT-DROP
-DOMAIN-SUFFIX,events.appsflyer.com,REJECT-DROP
-DOMAIN-SUFFIX,adjust.com,REJECT-DROP
-DOMAIN-SUFFIX,graph.facebook.com,REJECT-DROP
-DOMAIN-SUFFIX,doubleverify.com,REJECT-DROP
-DOMAIN-SUFFIX,mobileanalytics.us-east-1.amazonaws.com,REJECT-DROP
-
-[URL Rewrite]
-# 动态广告路径拦截
-^https?:\/\/.*\.talkatone\.com\/ad.*$ reject
-^https?:\/\/.*\.googleusercontent\.com\/talkatone_ads.*$ reject
-^https?:\/\/.*\.firebaseio\.com\/ad_requests.*$ reject
-^https?:\/\/.*\.doubleclick\.net\/pagead\/ads.*$ reject
-
-# 以下为该软件需要走代理的策略组名
-DOMAIN-SUFFIX,tktn.be,Talkatone
-
-# 核心功能域名 (DIRECT)
-DOMAIN-SUFFIX,inner-active.mobi,DIRECT
-DOMAIN-SUFFIX,talkatone.com,DIRECT
+# 让登录更容易
 DOMAIN-SUFFIX,mobilefuse.com,DIRECT
 DOMAIN-SUFFIX,inmobi.com,DIRECT
+DOMAIN-SUFFIX,crashlytics.com,DIRECT
+DOMAIN-SUFFIX,talkatone.com,DIRECT
 DOMAIN-SUFFIX,kochava.com,DIRECT
-DOMAIN-SUFFIX,cohere.com,DIRECT 
+# 这个域名最好走代理，我这边直连已超时
+DOMAIN-SUFFIX,tktn.be,Talkatone
+DOMAIN-SUFFIX,cohere.com,DIRECT
 DOMAIN-SUFFIX,ip-api.com,DIRECT
 DOMAIN-SUFFIX,agkn.com,DIRECT
 DOMAIN-SUFFIX,tktn.at,DIRECT
-
-# 特定 IP 段 (DIRECT)
 IP-CIDR,50.117.27.0/24,DIRECT,no-resolve
 IP-CIDR,69.46.75.0/24,DIRECT,no-resolve
 IP-CIDR,205.164.56.0/24,DIRECT,no-resolve
 IP-CIDR,63.251.124.0/24,DIRECT,no-resolve
 
+# DOMAIN,,REJECT-NO-DROP
 
+
+[Map Local]
+
+
+[MITM]
+hostname = %APPEND% gum.criteo.com
