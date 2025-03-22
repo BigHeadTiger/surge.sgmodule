@@ -1,0 +1,32 @@
+[Rule]
+DOMAIN-SUFFIX,senplayer.com
+DOMAIN-SUFFIX,senplayer.tv
+DOMAIN-SUFFIX,emby.media
+DOMAIN-SUFFIX,jellyfin.org
+DOMAIN-SUFFIX,plex.tv
+
+# Emby 服务器
+DOMAIN-SUFFIX,emby.wtf
+DOMAIN-SUFFIX,emby.app
+DOMAIN-KEYWORD,emby
+
+# Jellyfin 服务器
+DOMAIN-SUFFIX,jellyfin.wtf
+DOMAIN-KEYWORD,jellyfin
+
+# Plex 服务器
+DOMAIN-SUFFIX,plex.direct
+DOMAIN-KEYWORD,plex
+
+# 常见 CDN 代理优化
+DOMAIN-SUFFIX,cloudflare.com
+DOMAIN-SUFFIX,akamaihd.net
+DOMAIN-SUFFIX,fastly.net
+DOMAIN-SUFFIX,cachefly.net
+
+# 其他直连
+DOMAIN-SUFFIX,googlevideo.com
+DOMAIN-SUFFIX,media-amazon.com
+
+[URL Rewrite]
+^https?:\/\/(www\.)?senplayer\.(com|tv)\/api\/(auth|login) url reject-200
