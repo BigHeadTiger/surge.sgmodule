@@ -5,6 +5,9 @@ DOMAIN-SUFFIX,emby.media
 DOMAIN-SUFFIX,jellyfin.org
 DOMAIN-SUFFIX,plex.tv
 
+DOMAIN-SUFFIX,embyclub.maoxiong.cloud
+DOMAIN-SUFFIX,embyclub2.maoxiong.cloud
+
 # Emby 服务器
 DOMAIN-SUFFIX,emby.wtf
 DOMAIN-SUFFIX,emby.app
