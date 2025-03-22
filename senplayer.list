@@ -30,6 +30,3 @@ DOMAIN-SUFFIX,cachefly.net
 # 其他直连
 DOMAIN-SUFFIX,googlevideo.com
 DOMAIN-SUFFIX,media-amazon.com
-
-[URL Rewrite]
-^https?:\/\/(www\.)?senplayer\.(com|tv)\/api\/(auth|login) url reject-200
