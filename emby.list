@@ -22,5 +22,5 @@ DOMAIN-SUFFIX,wf.vban.xyz
 DOMAIN-SUFFIX,emby.nezhasu.com
 DOMAIN-SUFFIX,free.28.al
 DOMAIN-SUFFIX,media.micu.hk
-# PROCESS-NAME,SenPlayer.app
-# PROCESS-NAME,SenPlayer
+PROCESS-NAME,SenPlayer.app
+PROCESS-NAME,SenPlayer
