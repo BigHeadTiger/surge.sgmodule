@@ -12,7 +12,6 @@ DOMAIN,emby.wiki
 
 # 自定义 Emby 服务器分流规则
 DOMAIN-SUFFIX,micu.hk,DIRECT
-DOMAIN-SUFFIX,micu.hk,DIRECT
 DOMAIN-SUFFIX,emby3.misakaf.org
 DOMAIN-SUFFIX,stream3.misakaf.org
 DOMAIN-SUFFIX,z.sfcj.org
