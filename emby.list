@@ -11,6 +11,8 @@ DOMAIN,embyapp.com
 DOMAIN,emby.wiki
 
 # 自定义 Emby 服务器分流规则
+DOMAIN-SUFFIX,tv.micu.hk,DIRECT
+DOMAIN-SUFFIX,tv1.micu.hk,DIRECT
 DOMAIN-SUFFIX,emby3.misakaf.org
 DOMAIN-SUFFIX,stream3.misakaf.org
 DOMAIN-SUFFIX,z.sfcj.org
@@ -21,8 +23,6 @@ DOMAIN-SUFFIX,152.53.133.214
 DOMAIN-SUFFIX,wf.vban.xyz
 DOMAIN-SUFFIX,emby.nezhasu.com
 DOMAIN-SUFFIX,free.28.al
-DOMAIN-SUFFIX,tv.micu.hk,DIRECT
-DOMAIN-SUFFIX,tv1.micu.hk,DIRECT
 DOMAIN-SUFFIX,media.micu.hk
 PROCESS-NAME,SenPlayer.app
 PROCESS-NAME,SenPlayer
