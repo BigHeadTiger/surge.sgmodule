@@ -1,0 +1,6 @@
+#！name=emby.list
+#！desc=自建emby分流
+[Rule]
+DOMAIN-SUFFIX,emby.bangumi.ca,DIRECT
+DOMAIN-SUFFIX,micu.hk,DIRECT
+hostname = %APPEND%
