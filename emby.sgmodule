@@ -4,7 +4,7 @@
 DOMAIN-SUFFIX,emby.bangumi.ca,DIRECT
 DOMAIN-SUFFIX,micu.hk,DIRECT
 DOMAIN-SUFFIX,tanhuatv.site,DIRECT
-DOMAIN-SUFFIX,emby.ucloudhost.top
+DOMAIN-SUFFIX,emby.ucloudhost.top:8096,DIRECT
 DOMAIN-SUFFIX,emby.1l1.icu
 
 [MITM]
