@@ -10,6 +10,7 @@ DOMAIN-SUFFIX,wj.siepro.uk,DIRECT
 DOMAIN-SUFFIX,ck.siepro.uk,DIRECT
 DOMAIN-SUFFIX,uh.siepro.uk,DIRECT
 DOMAIN-SUFFIX,sg.siepro.uk,DIRECT
+DOMAIN-SUFFIX,nangua.de,DIRECT
  
 [MITM]
 hostname = %APPEND% emby.media, embyapp.com, media.micu.hk
