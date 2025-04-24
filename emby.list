@@ -11,18 +11,10 @@ DOMAIN,embyapp.com
 DOMAIN,emby.wiki
 
 # 自定义 Emby 服务器分流规则
-DOMAIN-SUFFIX,emby3.misakaf.org
-DOMAIN-SUFFIX,stream3.misakaf.org
-DOMAIN-SUFFIX,z.sfcj.org
 DOMAIN-SUFFIX,embyclub.maoxiong.cloud
 DOMAIN-SUFFIX,embyclub2.maoxiong.cloud
-DOMAIN-SUFFIX,abc.auroramedia.vip
-DOMAIN-SUFFIX,152.53.133.214
-DOMAIN-SUFFIX,wf.vban.xyz
 DOMAIN-SUFFIX,emby.nezhasu.com
 DOMAIN-SUFFIX,free.28.al
-DOMAIN-SUFFIX,emby.bettube.top 
-DOMAIN-SUFFIX,media.micu.hk
 DOMAIN-SUFFIX,emby.ucloudhost.top
 DOMAIN-SUFFIX,pornemby.maoxiong.cloud
 DOMAIN-SUFFIX,hoshino.maoxiong.cloud
