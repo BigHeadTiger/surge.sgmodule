@@ -7,6 +7,9 @@ DOMAIN-SUFFIX,gongyi.cherry-pornemby.top,DIRECT
 DOMAIN-SUFFIX,emby.1l1.icu,DIRECT
 DOMAIN-SUFFIX,nangua.de,DIRECT
 DOMAIN-SUFFIX,3hzpnb-tsfm8j.biliblili.uk,DIRECT
+DOMAIN-SUFFIX,tv.iill.top/m3u/Gather,DIRECT
+DOMAIN-SUFFIX,tv.iill.top/m3u/Live,DIRECT
+DOMAIN-SUFFIX,bit.ly/suxuang,DIRECT
  
 [MITM]
 hostname = %APPEND% emby.media, embyapp.com, media.micu.hk
