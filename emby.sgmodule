@@ -9,8 +9,8 @@ DOMAIN-SUFFIX,nangua.de,DIRECT
 DOMAIN-SUFFIX,3hzpnb-tsfm8j.biliblili.uk,DIRECT
 DOMAIN-SUFFIX,iill.top,DIRECT
 DOMAIN-SUFFIX,bit.ly,DIRECT
-DOMAIN-SUFFIX,medial.micu.hk
-DOMAIN-SUFFIX,media2.micu.hk
+DOMAIN-SUFFIX,tv.micu.hk
+DOMAIN-SUFFIX,tv1.micu.hk
  
 [MITM]
 hostname = %APPEND% emby.media, embyapp.com, media.micu.hk
