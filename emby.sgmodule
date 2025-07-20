@@ -10,6 +10,8 @@ DOMAIN-SUFFIX,iill.top,DIRECT
 DOMAIN-SUFFIX,bit.ly,DIRECT
 DOMAIN-SUFFIX,tv.micu.hk,DIRECT
 DOMAIN-SUFFIX,tv1.micu.hk,DIRECT
+DOMAIN-SUFFIX,c1.staryuki.me,DIRECT
+
  
 [MITM]
 hostname = %APPEND% emby.media, embyapp.com, media.micu.hk
