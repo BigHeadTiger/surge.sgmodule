@@ -11,7 +11,8 @@ DOMAIN-SUFFIX,bit.ly,DIRECT
 DOMAIN-SUFFIX,tv.micu.hk,DIRECT
 DOMAIN-SUFFIX,tv1.micu.hk,DIRECT
 DOMAIN-SUFFIX,c1.staryuki.me,DIRECT
-DOMAIN-SUFFIX,c2.staryuki.me,DIRECT
+DOMAIN-SUFFIX,fast-1.staryuki.me.kiven.cc,DIRECT
+DOMAIN-SUFFIX,fast-v6.staryuki.me.kiven.cc,DIRECT
 
  
 [MITM]
