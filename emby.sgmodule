@@ -13,6 +13,8 @@ DOMAIN-SUFFIX,tv1.micu.hk,DIRECT
 DOMAIN-SUFFIX,c1.staryuki.me,DIRECT
 DOMAIN-SUFFIX,fast-1.staryuki.me.kiven.cc,DIRECT
 DOMAIN-SUFFIX,fast-v6.staryuki.me.kiven.cc,DIRECT
+DOMAIN-SUFFIX,kfc.v50.su,DIRECT
+DOMAIN-SUFFIX,emby.v50.su,DIRECT
 
  
 [MITM]
