@@ -14,6 +14,8 @@ DOMAIN-SUFFIX,c1.staryuki.me,DIRECT
 DOMAIN-SUFFIX,fast-1.staryuki.me.kiven.cc,DIRECT
 DOMAIN-SUFFIX,fast-v6.staryuki.me.kiven.cc,DIRECT
 DOMAIN-SUFFIX,emby.v50.su,DIRECT
+DOMAIN-SUFFIX,cdn.qdz1.top,DIRECT
+
 
  
 [MITM]
