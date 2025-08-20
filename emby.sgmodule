@@ -2,7 +2,6 @@
 #!desc=自建emby分流
 [Rule]
 DOMAIN-SUFFIX,emby.bangumi.ca,DIRECT
-DOMAIN-SUFFIX,tanhuatv.site,DIRECT
 DOMAIN-SUFFIX,gongyi.cherry-pornemby.top,DIRECT
 DOMAIN-SUFFIX,emby.1l1.icu,DIRECT
 DOMAIN-SUFFIX,3hzpnb-tsfm8j.biliblili.uk,DIRECT
