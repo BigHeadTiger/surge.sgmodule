@@ -59,5 +59,6 @@ DOMAIN-SUFFIX,us.nanflix.net
 DOMAIN-SUFFIX,emby.feiniu.lol
 DOMAIN-SUFFIX,test.feiniu.lol
 DOMAIN-SUFFIX,emby.nubebelle.cn
+DOMAIN-SUFFIX,10520.xyz:443
 PROCESS-NAME,SenPlayer.app
 PROCESS-NAME,SenPlayer
