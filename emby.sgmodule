@@ -18,7 +18,7 @@ DOMAIN-SUFFIX,emby.embyserver.dpdns.org:16666,DIRECT
 DOMAIN-SUFFIX,emby.ipv4.embyserver.dpdns.org:16666,DIRECT
 DOMAIN-SUFFIX,emby.ipv6.embyserver.dpdns.org:16666,DIRECT
 DOMAIN-SUFFIX,bai.yezi.my,DIRECT
-
+DOMAIN-SUFFIX,guaiguaiemby.83787.de,DIRECT
  
 [MITM]
 hostname = %APPEND% emby.media, embyapp.com, media.micu.hk
