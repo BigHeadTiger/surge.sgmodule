@@ -18,7 +18,6 @@ DOMAIN-SUFFIX,emby.embyserver.dpdns.org:16666,DIRECT
 DOMAIN-SUFFIX,emby.ipv4.embyserver.dpdns.org:16666,DIRECT
 DOMAIN-SUFFIX,emby.ipv6.embyserver.dpdns.org:16666,DIRECT
 DOMAIN-SUFFIX,bai.yezi.my,DIRECT
-DOMAIN-SUFFIX,guaiguaiemby.83787.de,DIRECT
 DOMAIN-SUFFIX,faemby.vip,DIRECT
  
 [MITM]
