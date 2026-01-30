@@ -20,6 +20,7 @@ DOMAIN-SUFFIX,emby.ipv6.embyserver.dpdns.org:16666,DIRECT
 DOMAIN-SUFFIX,bai.yezi.my,DIRECT
 DOMAIN-SUFFIX,faemby.vip,DIRECT
 DOMAIN-SUFFIX,101514.xyz,DIRECT
+DOMAIN-SUFFIX,199.188.198.202,DIRECT
  
 [MITM]
 hostname = %APPEND% emby.media, embyapp.com, media.micu.hk
