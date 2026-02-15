@@ -14,6 +14,7 @@ RULE-SET:https://ruleset.skk.moe/Modules/Rules/sukka_local_dns_mapping/qihoo360.
 RULE-SET:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Surge/WeChat/WeChat.list = server:https://doh.pub/dns-query
 RULE-SET:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AliPay/AliPay.list = server:quic://dns.alidns.com:853
 RULE-SET:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/12306/12306.list = server:quic://dns.alidns.com:853
+RULE-SET:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/ChinaUnicom/ChinaUnicom.list = server:quic://dns.alidns.com:853
 RULE-SET:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/MeiTuan/MeiTuan.list = server:quic://dns.alidns.com:853
 RULE-SET:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Surge/XiaoHongShu/XiaoHongShu.list = server:quic://dns.alidns.com:853
 RULE-SET:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Pinduoduo/Pinduoduo.list = server:quic://dns.alidns.com:853
