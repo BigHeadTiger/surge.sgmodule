@@ -1,7 +1,16 @@
 # =========================
 # Weather Apps Rule-Set
-# Caiyun + Moji + QWeather
+# Apple + Caiyun + Moji + QWeather
 # =========================
+
+
+# =========
+# Apple Weather (iOS Weather)
+# =========
+DOMAIN,weatherkit.apple.com
+DOMAIN,api.weatherkit.apple.com
+DOMAIN-SUFFIX,weatherkit.apple.com
+DOMAIN-SUFFIX,weather-data.apple.com
 
 
 # =========
