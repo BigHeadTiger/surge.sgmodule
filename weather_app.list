@@ -1,0 +1,32 @@
+# =========================
+# Weather Apps Rule-Set
+# Caiyun + Moji + QWeather
+# =========================
+
+
+# =========
+# 彩云天气
+# =========
+DOMAIN,api.caiyunapp.com
+DOMAIN-SUFFIX,caiyunapp.com
+DOMAIN-SUFFIX,caiyunai.com
+
+
+# =========
+# 墨迹天气
+# =========
+DOMAIN,api.moji.com
+DOMAIN-SUFFIX,moji.com
+DOMAIN-SUFFIX,mojiweather.com
+DOMAIN-SUFFIX,mojicdn.com
+DOMAIN-SUFFIX,mojichina.com
+
+
+# =========
+# 和风天气
+# =========
+DOMAIN,api.qweather.com
+DOMAIN,geoapi.qweather.com
+DOMAIN,devapi.qweather.com
+DOMAIN-SUFFIX,qweather.com
+DOMAIN-SUFFIX,qweatherapi.com
