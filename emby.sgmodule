@@ -21,6 +21,9 @@ DOMAIN-SUFFIX,bai.yezi.my,DIRECT
 DOMAIN-SUFFIX,faemby.vip,DIRECT
 DOMAIN-SUFFIX,101514.xyz,DIRECT
 DOMAIN-SUFFIX,199.188.198.202,DIRECT
+DOMAIN-SUFFIX,gy1.emby.yun,DIRECT
+DOMAIN-SUFFIX,gy2.emby.yun,DIRECT
+DOMAIN-SUFFIX,gy3.emby.yun,DIRECT
  
 [MITM]
 hostname = %APPEND% emby.media, embyapp.com, media.micu.hk
