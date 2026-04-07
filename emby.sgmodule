@@ -25,6 +25,7 @@ DOMAIN-SUFFIX,gy1.emby.yun,DIRECT
 DOMAIN-SUFFIX,gy2.emby.yun,DIRECT
 DOMAIN-SUFFIX,gy3.emby.yun,DIRECT
 DOMAIN-SUFFIX,gy1.66990000.xyz,DIRECT
+DOMAIN-SUFFIX,gy.emby.yun,DIRECT
  
 [MITM]
 hostname = %APPEND% emby.media, embyapp.com, media.micu.hk
