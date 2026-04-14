@@ -2,9 +2,7 @@
 #!desc= 修改自Sukka大佬的配置，感谢大佬
 [Host]
 dns.alidns.com = 223.5.5.5, 223.6.6.6, 2400:3200:baba::1, 2400:3200::1
-server:quic://dns.alidns.com:853 = {
-  fallback: server:https://dns.alidns.com/dns-query
-}
+server:quic://dns.alidns.com:853
 dot.pub = server:119.29.29.29
 doh.pub = server:119.29.29.29
 dns.pub = server:119.29.29.29
@@ -28,6 +26,7 @@ RULE-SET:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/hea
 RULE-SET:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Pinduoduo/Pinduoduo.list = server:quic://dns.alidns.com:853
 RULE-SET:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/DouYin/DouYin.list = server:180.184.1.1
 RULE-SET:https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/JingDong/JingDong.list = server:quic://dns.alidns.com:853
+RULE-SET:https://ruleset.skk.moe/Modules/Rules/sukka_local_dns_mapping/bilibili.conf = server:quic://dns.alidns.com:853
 RULE-SET:https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/refs/heads/main/weather_app.list = server:quic://dns.alidns.com:853
 *.m2m = server:system
 injections.adguard.org = server:system
