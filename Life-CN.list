@@ -1,5 +1,6 @@
-
+###############################
 # 12306
+###############################
 DOMAIN-SUFFIX,12306.cn
 DOMAIN-SUFFIX,95306.cn
 DOMAIN-SUFFIX,creip.cn
@@ -16,7 +17,9 @@ DOMAIN-SUFFIX,95572.com
 DOMAIN-SUFFIX,cre.cn
 DOMAIN-SUFFIX,crscl.com.cn
 
+###############################
 # ChinaUnicom 中国联通
+###############################
 DOMAIN-SUFFIX,chinaunicom.com.cn
 DOMAIN-SUFFIX,chinaunicom.com.hk
 DOMAIN-SUFFIX,chinaunicomglobal.com
@@ -52,7 +55,9 @@ DOMAIN-SUFFIX,wom186.com
 DOMAIN-SUFFIX,mucfc.com
 IP-CIDR,113.200.56.63/32,no-resolve
 
+###############################
 # DiDi 滴滴出行
+###############################
 DOMAIN-SUFFIX,apptaxi.com.cn
 DOMAIN-SUFFIX,cxyule.com
 DOMAIN-SUFFIX,didi-food.com
@@ -79,7 +84,9 @@ DOMAIN-SUFFIX,udache.com
 DOMAIN-SUFFIX,xiaojuchefu.cn
 DOMAIN-SUFFIX,xiaojukeji.com
 
+###############################
 # JingDong 京东
+###############################
 DOMAIN-SUFFIX,300hu.com
 DOMAIN-SUFFIX,360top.com
 DOMAIN-SUFFIX,blackdragon.com
@@ -330,7 +337,9 @@ DOMAIN-SUFFIX,yihaodian.com
 DOMAIN-SUFFIX,yihaodianimg.com
 DOMAIN-SUFFIX,yihaomall.com
 
+###############################
 #  MeiTuan 美团
+###############################
 DOMAIN-SUFFIX,dianping.com
 DOMAIN-SUFFIX,maoyan.com
 DOMAIN-SUFFIX,meituan.com
@@ -339,7 +348,9 @@ DOMAIN-SUFFIX,mtyun.com
 DOMAIN-SUFFIX,neixin.cn
 DOMAIN-SUFFIX,sankuai.com
 
+###############################
 # PinDuoDuo 拼多多
+###############################
 DOMAIN-SUFFIX,pddpic.com
 DOMAIN-SUFFIX,pinduoduo.com
 DOMAIN-SUFFIX,yangkeduo.com
