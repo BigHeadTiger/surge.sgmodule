@@ -29,6 +29,10 @@ DOMAIN-SUFFIX,gy.emby.yun,DIRECT
 DOMAIN-SUFFIX,a.wedg.top,DIRECT
 DOMAIN-SUFFIX,tt.wedg.top,DIRECT
 DOMAIN-SUFFIX,cf.wedg.top,DIRECT
- 
+DOMAIN-SUFFIX,mwp.bydsb.cc.cd,DIRECT
+DOMAIN-SUFFIX,mwp.cnmbyd.de5.net,DIRECT
+DOMAIN-SUFFIX,mwp.cnmbyd.xyz,DIRECT
+DOMAIN-SUFFIX,mwp.fw1.de5.net,DIRECT
+DOMAIN-SUFFIX,mwp.sbcnm.us.ci,DIRECT
 [MITM]
 hostname = %APPEND% emby.media, embyapp.com, media.micu.hk
