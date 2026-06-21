@@ -2,7 +2,7 @@
 #!desc=自建emby分流
 [Rule]
 DOMAIN-SUFFIX,emby.bangumi.ca,DIRECT
-HODOMAIN-SUFFIX,yp.lyezi.cc,DIRECT
+DOMAIN-SUFFIX,yp.lyezi.cc,DIRECT
 DOMAIN-SUFFIX,kuai1.lyezi.xyz,DIRECT
 DOMAIN-SUFFIX,kuai2.lyezi.xyz,DIRECT
 DOMAIN-SUFFIX,kuai3.lyezi.xyz,DIRECT
