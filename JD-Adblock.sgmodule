@@ -1,6 +1,5 @@
-#!name=360buyimg Reject Module
+#!name=京东开屏广告
 #!desc=基于 URL Rewrite 拦截特定图片请求
-#!category=Block
 
 [MITM]
 hostname = %APPEND% m.360buyimg.com
