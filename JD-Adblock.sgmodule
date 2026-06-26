@@ -1,8 +1,8 @@
 #!name=京东开屏广告
 #!desc=基于 URL Rewrite 拦截特定图片请求
 
+[URL Rewrite]
+^https?:\/\/m\.360buyimg\.com\/mobilecms\/s1125x2436_jfs reject-200
+
 [MITM]
 hostname = %APPEND% m.360buyimg.com
-
-https://ahrefs.com/writing-tools/paragraph-rewriter
-^https?:\/\/m\.360buyimg\.com\/mobilecms\/s1125x2436_jfs reject-200
