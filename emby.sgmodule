@@ -15,5 +15,6 @@ DOMAIN-SUFFIX,jp.wedg.top,DIRECT
 DOMAIN-SUFFIX,cmcc.wedg.top,DIRECT
 DOMAIN-SUFFIX,gy.emby.yun,DIRECT
 DOMAIN-SUFFIX,emby.bangumi.ca,DIRECT
+DOMAIN-SUFFIX,od.emby.fan,DIRECT
 [MITM]
 hostname = %APPEND% emby.media, embyapp.com
