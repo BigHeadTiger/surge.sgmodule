@@ -16,5 +16,10 @@ DOMAIN-SUFFIX,cmcc.wedg.top,DIRECT
 DOMAIN-SUFFIX,gy.emby.yun,DIRECT
 DOMAIN-SUFFIX,emby.bangumi.ca,DIRECT
 DOMAIN-SUFFIX,od.emby.fan,DIRECT
+DOMAIN-SUFFIX,mwp.bydsb.cc.cd,DIRECT
+DOMAIN-SUFFIX,mwp.cnmbyd.de5.net,DIRECT
+DOMAIN-SUFFIX,mwp.cnmbyd.xyz,DIRECT
+DOMAIN-SUFFIX,mwp.fw1.de5.net,DIRECT
+DOMAIN-SUFFIX,mwp.sbcnm.us.ci,DIRECT
 [MITM]
 hostname = %APPEND% emby.media, embyapp.com
