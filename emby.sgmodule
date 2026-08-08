@@ -23,5 +23,9 @@ DOMAIN-SUFFIX,mwp.fw1.de5.net,DIRECT
 DOMAIN-SUFFIX,mwp.sbcnm.us.ci,DIRECT
 DOMAIN-SUFFIX,goemby.entertang.work,DIRECT
 DOMAIN-SUFFIX,em.mlhyy.top,DIRECT
+DOMAIN-SUFFIX,aaa.yusen6.ccwu.cc,DIRECT
+DOMAIN-SUFFIX,emby.yusen.us.ci,DIRECT
+DOMAIN-SUFFIX,embya.yusen.cyou,DIRECT
+DOMAIN-SUFFIX,emby.yusen.cc.cd,DIRECT
 [MITM]
 hostname = %APPEND% emby.media, embyapp.com
