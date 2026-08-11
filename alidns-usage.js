@@ -369,9 +369,9 @@ function progressBar(percent) {
 
   return (
 
-    "█".repeat(filled) +
+    "●".repeat(filled) +
 
-    "░".repeat(total - filled)
+    "○".repeat(total - filled)
   );
 }
 
