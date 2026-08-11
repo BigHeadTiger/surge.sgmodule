@@ -420,6 +420,8 @@ function accountPanel(
     quota - billable;
 
   return `${accountName}  ${bar} ${formatPercent(percent)}%  余${compactNumber(remaining)}`;
+  
+}
 
 function panelDone(
   title,
