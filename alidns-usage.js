@@ -343,9 +343,7 @@ function trim(value) {
  */
 function progressBar(percent) {
 
-  const total = 10;
-
-  // 进度条最多填满 10 格
+  const total = 5;
 
   const safePercent = Math.max(
 
@@ -355,16 +353,25 @@ function progressBar(percent) {
 
   );
 
-  const filled = percent > 0
-  ? Math.max(1, Math.round((safePercent / 100) * total))
-  : 0;
+  let filled = Math.round(
+
+    (safePercent / 100) * total
+
+  );
+
+  // 有使用量时至少显示 1 格
+
+  if (percent > 0 && filled === 0) {
+
+    filled = 1;
+
+  }
 
   return (
 
     "█".repeat(filled) +
 
     "░".repeat(total - filled)
-
   );
 }
 
@@ -413,8 +420,6 @@ function accountPanel(
     quota - billable;
 
   return `${accountName}  ${bar} ${formatPercent(percent)}%  余${compactNumber(remaining)}`;
-
-}
 
 function panelDone(
   title,
