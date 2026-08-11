@@ -416,17 +416,6 @@ function accountPanel(
 
 }
 
-  const remaining =
-    quota - billable;
-
-  return [
-    accountName,
-    `${bar} ${formatPercent(percent)}%`,
-    `${compactNumber(billable)} / ${compactNumber(quota)}`,
-    `剩余 ${compactNumber(remaining)}`,
-  ].join("\n");
-}
-
 function panelDone(
   title,
   content,
