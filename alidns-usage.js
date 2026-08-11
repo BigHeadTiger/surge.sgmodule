@@ -342,20 +342,29 @@ function trim(value) {
  * 100%   -> ██████████
  */
 function progressBar(percent) {
+
   const total = 10;
 
+  // 进度条最多填满 10 格
+
   const safePercent = Math.max(
+
     0,
+
     Math.min(100, percent)
+
   );
 
-  const filled = Math.round(
-    safePercent / 10
-  );
+  const filled = percent > 0
+  ? Math.max(1, Math.round((safePercent / 100) * total))
+  : 0;
 
   return (
+
     "█".repeat(filled) +
+
     "░".repeat(total - filled)
+
   );
 }
 
@@ -370,28 +379,42 @@ function formatPercent(value) {
 }
 
 function accountPanel(
+
   accountName,
+
   billable,
+
   quota
+
 ) {
+
   const percent =
+
     quota > 0
+
       ? (billable / quota) * 100
+
       : 0;
 
   const bar = progressBar(percent);
 
   if (billable > quota) {
+
     const exceeded =
+
       billable - quota;
 
-    return [
-      accountName,
-      `${bar} ${formatPercent(percent)}% ⚠️`,
-      `${compactNumber(billable)} / ${compactNumber(quota)}`,
-      `已超额 ${compactNumber(exceeded)}`,
-    ].join("\n");
+    return `${accountName}  ${bar} ${formatPercent(percent)}%  超${compactNumber(exceeded)} ⚠️`;
+
   }
+
+  const remaining =
+
+    quota - billable;
+
+  return `${accountName}  ${bar} ${formatPercent(percent)}%  余${compactNumber(remaining)}`;
+
+}
 
   const remaining =
     quota - billable;
