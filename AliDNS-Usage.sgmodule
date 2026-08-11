@@ -1,0 +1,10 @@
+#!name=阿里 HTTPDNS 用量
+#!desc=在 Surge Panel 中查询多个阿里云账号本月 HTTPDNS 用量、免费额度与剩余量。凭据仅保存在 Surge 本机，由脚本直接签名请求阿里云 OpenAPI。
+#!arguments=账号1名称:"账号 1",账号1AccessKey ID:"",账号1AccessKey Secret:"",账号2名称:"#",账号2AccessKey ID:"",账号2AccessKey Secret:"",账号3名称:"#",账号3AccessKey ID:"",账号3AccessKey Secret:"",账号4名称:"#",账号4AccessKey ID:"",账号4AccessKey Secret:"",账号5名称:"#",账号5AccessKey ID:"",账号5AccessKey Secret:"",月度额度:10000000,刷新间隔:3600
+#!arguments-desc=每个字段会在 Surge 模块参数页中单独显示，最多支持 5 个阿里云账号。\n\n账号名称:用于面板显示；填写 # 或留空表示不启用该账号。\nAccessKey ID / Secret:填写该阿里云主账号下 RAM 用户的 OpenAPI 只读凭据。请仅授予 pubdns:DescribePdnsRequestStatistic，不要使用主账号高权限密钥。\n\n月度额度:每个账号每自然月的 HTTP 等价免费额度，默认 10000000。HTTPS（含 DoH/DoT）按 5 倍折算，与控制台“每月免费资源包”口径一致。\n\n刷新间隔:面板自动刷新间隔，单位秒。
+
+[Panel]
+阿里 HTTPDNS 用量 = title="阿里 HTTPDNS 用量",content="请先填写 RAM 只读凭据",icon=cloud.fill,icon-color=#ff6a00,script-name=alidns-usage,update-interval={{{刷新间隔}}}
+
+[Script]
+alidns-usage = type=generic,script-path=https://raw.githubusercontent.com/RoaycL/Surge/main/Module/AliDNSUsage/alidns-usage.js,timeout=30,script-update-interval=300,argument="name1={{{账号1名称}}}&id1={{{账号1AccessKey ID}}}&secret1={{{账号1AccessKey Secret}}}&name2={{{账号2名称}}}&id2={{{账号2AccessKey ID}}}&secret2={{{账号2AccessKey Secret}}}&name3={{{账号3名称}}}&id3={{{账号3AccessKey ID}}}&secret3={{{账号3AccessKey Secret}}}&name4={{{账号4名称}}}&id4={{{账号4AccessKey ID}}}&secret4={{{账号4AccessKey Secret}}}&name5={{{账号5名称}}}&id5={{{账号5AccessKey ID}}}&secret5={{{账号5AccessKey Secret}}}&quota={{{月度额度}}}"
