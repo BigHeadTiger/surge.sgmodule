@@ -1,0 +1,12 @@
+#!name=Meituan Log Drop
+#!desc=Reject-Drop Meituan logging and metrics domains
+
+[Rule]
+DOMAIN,al-log.d.meituan.net,REJECT-DROP,pre-matching
+DOMAIN,al-log.dreport.meituan.net,REJECT-DROP,pre-matching
+DOMAIN,route-stats.d.meituan.net,REJECT-DROP,pre-matching
+DOMAIN,route-stats.dreport.meituan.net,REJECT-DROP,pre-matching
+DOMAIN,metrics-picture.d.meituan.net,REJECT-DROP,pre-matching
+DOMAIN,metrics-picture.dreport.meituan.net,REJECT-DROP,pre-matching
+DOMAIN,maplocatesdksnapshot.d.meituan.net,REJECT-DROP,pre-matching
+DOMAIN,maplocatesdksnapshot.dreport.meituan.net,REJECT-DROP,pre-matching
