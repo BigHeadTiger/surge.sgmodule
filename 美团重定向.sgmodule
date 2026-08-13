@@ -1,0 +1,8 @@
+#!name=Meituan Redirect
+#!desc=Redirect Meituan domains to dreport domains
+
+[Host]
+al-log.d.meituan.net = al-log.dreport.meituan.net
+route-stats.d.meituan.net = route-stats.dreport.meituan.net
+metrics-picture.d.meituan.net = metrics-picture.dreport.meituan.net
+maplocatesdksnapshot.d.meituan.net = maplocatesdksnapshot.dreport.meituan.net
