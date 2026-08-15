@@ -1,12 +1,15 @@
-#!name=Meituan Redirect
-#!desc=Redirect Meituan domains to dreport domains
+#!name=美团重定向
+#!desc=VPN环境下，错误解析修复。
 
-[General]
-# > 真实 IP 映射（解决 Fake-IP 模式下部分服务不兼容的问题）
-always-real-ip = *.meituan.net 
+[URL Rewrite]
+^http(s)?:\/\/(.*).d.meituan.net http$1://$2.dreport.meituan.net 302
 
 [Host]
-al-log.d.meituan.net = al-log.dreport.meituan.net, server:system
-route-stats.d.meituan.net = route-stats.dreport.meituan.net, server:system
-metrics-picture.d.meituan.net = metrics-picture.dreport.meituan.net, server:system
-maplocatesdksnapshot.d.meituan.net = maplocatesdksnapshot.dreport.meituan.net, server:system
+ntp.nasa.gov = time.nist.gov
+
+[MITM]
+hostname = %APPEND% 
+al-log.d.meituan.net,
+route-stats.d.meituan.net,
+metrics-picture.d.meituan.net,
+maplocatesdksnapshot.d.meituan.net
