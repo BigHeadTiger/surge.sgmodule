@@ -3,7 +3,7 @@
 
 [General]
 # > 真实 IP 映射（解决 Fake-IP 模式下部分服务不兼容的问题）
-always-real-ip = *.meituan.net
+always-real-ip = *.meituan.net 
 
 [Host]
 al-log.d.meituan.net = al-log.dreport.meituan.net, server:system
