@@ -8,8 +8,4 @@
 ntp.nasa.gov = time.nist.gov
 
 [MITM]
-hostname = %APPEND% 
-al-log.d.meituan.net,
-route-stats.d.meituan.net,
-metrics-picture.d.meituan.net,
-maplocatesdksnapshot.d.meituan.net
+hostname = %APPEND% al-log.d.meituan.net,route-stats.d.meituan.net,metrics-picture.d.meituan.net,maplocatesdksnapshot.d.meituan.net
