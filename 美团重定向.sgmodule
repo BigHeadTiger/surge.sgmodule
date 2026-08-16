@@ -1,4 +1,4 @@
-#!name=美团重定向
+#!name=Meituan Redirec
 #!desc=VPN环境下，错误解析修复。
 
 [URL Rewrite]
