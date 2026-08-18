@@ -290,40 +290,6 @@ function accountPanel(accountName, billable, quota) {
   return `${accountName}  ${bar} ${formatPercent(percent)}%  余${compactNumber(remaining)}`;
 }
 
-function buildSummary(settled, accountCount) {
-  let totalBillable = 0;
-  let successCount = 0;
-
-  settled.forEach((result) => {
-    if (result.status === "fulfilled") {
-      totalBillable += result.value.usage.billable;
-      successCount += 1;
-    }
-  });
-
-  if (successCount === 0) {
-    return "全部账号查询失败";
-  }
-
-  const totalQuota = accountCount * monthlyQuota;
-  const percent = totalQuota > 0 ? (totalBillable / totalQuota) * 100 : 0;
-  const bar = progressBar(percent);
-  const suffix = successCount < accountCount ? "（不含失败账号）" : "";
-
-  if (totalBillable > totalQuota) {
-    const exceeded = totalBillable - totalQuota;
-    return `总计  ${bar} ${formatPercent(percent)}%  已用${compactNumber(totalBillable)} 超${compactNumber(exceeded)} ⚠️${suffix}`;
-  }
-
-  const remaining = totalQuota - totalBillable;
-  return `总计  ${bar} ${formatPercent(percent)}%  已用${compactNumber(totalBillable)} 余${compactNumber(remaining)}${suffix}`;
-}
-
-function currentTimeString() {
-  const now = new Date();
-  return `${now.getMonth() + 1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-}
-
 function panelDone(title, content, style = "info") {
   $done({
     title,
@@ -532,18 +498,9 @@ function base64(bytes) {
     }
   });
 
-  const summary = buildSummary(settled, accounts.length);
-  const content = [
-    summary,
-    "",
-    accountBlocks.join("\n\n"),
-    "",
-    `更新于 ${currentTimeString()}`,
-  ].join("\n");
-
   panelDone(
     "阿里 HTTPDNS",
-    content,
+    accountBlocks.join("\n\n"),
     successCount ? "info" : "error"
   );
 })().catch((error) => {
