@@ -272,7 +272,7 @@ if (typeof Promise.allSettled !== "function") {
     throw new Error("未配置账号：请在 Surge 中编辑本模块的参数，填写 name1/id1/secret1（或旧格式 accounts=名称|ID|Secret）");
 
   const info = monthInfo();
-  if (DEBUG) console.log(`[AliDNS] 统计区间 ${info.start} ~ ${info.end}（已过 ${info.elapsed}/${info.totalDays} 天）`);
+  if (DEBUG) console.log(`[AliDNS] 统计区间 ${info.start} ~ ${info.end}（本月已过 ${info.elapsed} 天）`);
 
   const results = await Promise.allSettled(ACCOUNTS.map(async (a) => {
     const data = await httpJson(signedUrl(a, info));
