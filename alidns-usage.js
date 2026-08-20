@@ -230,17 +230,19 @@ const compact = (v) =>
   : v >= 1e4 ? `${trim(v / 1e4)}万`
   : Math.round(v).toLocaleString("zh-CN");
 
-// 每账号两行：账号名 + 「日均 X · 已用 Y」；level: ok | over(已超) | error(失败)
-function accountBlock(a, r, info) {
+// 单账号只输出一行「日均 X · 已用 Y」；多账号/失败时前缀账号名
+// level: ok | over(已超) | error(失败)
+function accountBlock(a, r, info, showName) {
   const name = maskName(a.name);
+  const head = showName ? `${name}\n` : "";
   if (r.status !== "fulfilled") {
     const msg = String(r.reason && r.reason.message ? r.reason.message : r.reason).replace(/\s+/g, " ").slice(0, 90);
-    return { text: `${name} ⚠️ 查询失败\n${msg}`, level: "error" };
+    return { text: `${head}⚠️ 查询失败\n${msg}`, level: "error" };
   }
   const used = r.value;
   const avg = used / info.elapsed;
   return {
-    text: `${name}\n日均 ${compact(avg)} · 已用 ${compact(used)}`,
+    text: `${head}日均 ${compact(avg)} · 已用 ${compact(used)}`,
     level: used > a.quota ? "over" : "ok",
   };
 }
@@ -280,7 +282,7 @@ if (typeof Promise.allSettled !== "function") {
     return b;
   }));
 
-  const blocks = ACCOUNTS.map((a, i) => accountBlock(a, results[i], info));
+  const blocks = ACCOUNTS.map((a, i) => accountBlock(a, results[i], info, ACCOUNTS.length > 1));
   const okCount = results.filter((r) => r.status === "fulfilled").length;
   const parts = [];
   if (ACCOUNTS.length > 1) parts.push(summaryLine(ACCOUNTS, results, info));
