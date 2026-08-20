@@ -1,514 +1,213 @@
-/* AliDNS HTTPDNS Usage Panel for Surge */
+/* AliDNS HTTPDNS 用量面板（优化精简版）
+ * 计费口径：HTTP=1x；HTTPS/DoH/DoT=5x。HttpsCount 已含 DoH，勿再叠加 DohTotalCount。
+ * 凭据仅用于本地签名，请求直发阿里云 OpenAPI，不经过第三方。
+ */
 
-const API_ENDPOINT = "https://alidns.aliyuncs.com/";
-const API_VERSION = "2015-01-09";
-const ACTION = "DescribePdnsRequestStatistic";
+const API = "https://alidns.aliyuncs.com/";
+const ARGS = parseArgument(String($argument || ""));
+const QUOTA = positive(ARGS.quota, 1e7);   // 每账号月度免费额度
+const ACCOUNTS = parseAccounts(ARGS);
 
-const args = parseArgument(String($argument || ""));
-const monthlyQuota = positiveNumber(args.quota, 10000000);
-const accounts = parseAccounts(args);
-
-function safeDecode(value) {
-  try {
-    return decodeURIComponent(value);
-  } catch (_) {
-    return value;
-  }
-}
+/* ---------- 参数解析 ---------- */
 
 function parseArgument(raw) {
-  return raw
-    .split("&")
-    .filter(Boolean)
-    .reduce((result, part) => {
-      const index = part.indexOf("=");
-      const key = index < 0 ? part : part.slice(0, index);
-      const value = index < 0 ? "" : part.slice(index + 1);
-      result[safeDecode(key)] = safeDecode(value);
-      return result;
-    }, {});
+  return raw.split("&").filter(Boolean).reduce((o, p) => {
+    const i = p.indexOf("=");
+    const k = i < 0 ? p : p.slice(0, i);
+    o[decode(k)] = decode(i < 0 ? "" : p.slice(i + 1));
+    return o;
+  }, {});
 }
 
-function parseAccounts(values) {
-  const dynamicAccounts = [];
-  const slots = new Set();
+function decode(v) { try { return decodeURIComponent(v); } catch { return v; } }
+function positive(v, fb) { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : fb; }
 
-  Object.keys(values).forEach((key) => {
-    const match = key.match(/^(?:name|id|secret)(\d+)$/);
-    if (match) slots.add(match[1]);
-  });
+// 新格式 name1/id1/secret1...；旧格式 accounts=名称|ID|Secret;...
+function parseAccounts(o) {
+  const slots = {};
+  for (const k in o) {
+    const m = k.match(/^(?:name|id|secret)(\d+)$/);
+    if (m) {
+      const s = m[1];
+      slots[s] = slots[s] || {};
+      slots[s][m[0].replace(/\d+$/, "")] = String(o[k]).trim();
+    }
+  }
+  const list = Object.keys(slots)
+    .sort((a, b) => a - b)
+    .map((s) => slots[s])
+    .filter((a) => a.name && a.name !== "#" && a.id && a.secret)
+    .map((a) => ({ name: a.name, accessKeyId: a.id, accessKeySecret: a.secret }));
+  if (list.length) return list;
 
-  Array.from(slots)
-    .sort((a, b) => Number(a) - Number(b))
-    .forEach((slot) => {
-      const name = String(values[`name${slot}`] || "").trim();
-      const accessKeyId = String(values[`id${slot}`] || "").trim();
-      const accessKeySecret = String(values[`secret${slot}`] || "").trim();
-
-      if (name && name !== "#" && accessKeyId && accessKeySecret) {
-        dynamicAccounts.push({ name, accessKeyId, accessKeySecret });
-      }
-    });
-
-  if (dynamicAccounts.length) return dynamicAccounts;
-
-  // 兼容旧格式：accounts=账号1|AccessKeyID|AccessKeySecret;账号2|...
-  return String(values.accounts || "")
-    .split(";")
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .map((item, index) => {
-      const parts = item.split("|").map((part) => part.trim());
-      return {
-        name: parts[0] || `账号${index + 1}`,
-        accessKeyId: parts[1] || "",
-        accessKeySecret: parts.slice(2).join("|") || "",
-      };
-    })
-    .filter((item) => item.accessKeyId && item.accessKeySecret);
+  return String(o.accounts || "").split(";").filter(Boolean).map((item, i) => {
+    const p = item.split("|").map((x) => x.trim());
+    return { name: p[0] || `账号${i + 1}`, accessKeyId: p[1] || "", accessKeySecret: p.slice(2).join("|") || "" };
+  }).filter((a) => a.accessKeyId && a.accessKeySecret);
 }
 
-function positiveNumber(value, fallback) {
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : fallback;
-}
+/* ---------- 阿里云 RPC 签名 ---------- */
 
-function pad(value) {
-  return String(value).padStart(2, "0");
-}
+const enc = (s) =>
+  encodeURIComponent(String(s)).replace(/[!'()*]/g, (c) => "%" + c.charCodeAt(0).toString(16).toUpperCase());
 
-function formatDate(date) {
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
+const pad = (n) => String(n).padStart(2, "0");
+const fmt = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const now = new Date();
+const RANGE = { start: fmt(new Date(now.getFullYear(), now.getMonth(), 1)), end: fmt(now) };
 
-function monthRange() {
-  const now = new Date();
-  return {
-    startDate: formatDate(new Date(now.getFullYear(), now.getMonth(), 1)),
-    endDate: formatDate(now),
-  };
-}
-
-function nonce() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
-}
-
-function isoTimestamp() {
-  return new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
-}
-
-function percentEncode(value) {
-  return encodeURIComponent(String(value)).replace(
-    /[!'()*]/g,
-    (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`
-  );
-}
-
-function signedUrl(account, startDate, endDate) {
-  const parameters = {
+function signedUrl(account) {
+  const p = {
     AccessKeyId: account.accessKeyId,
-    Action: ACTION,
-    EndDate: endDate,
+    Action: "DescribePdnsRequestStatistic",
+    EndDate: RANGE.end,
     Format: "JSON",
     Lang: "zh",
     Type: "ACCOUNT",
     SignatureMethod: "HMAC-SHA1",
-    SignatureNonce: nonce(),
+    SignatureNonce: `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`,
     SignatureVersion: "1.0",
-    StartDate: startDate,
-    Timestamp: isoTimestamp(),
-    Version: API_VERSION,
+    StartDate: RANGE.start,
+    Timestamp: new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
+    Version: "2015-01-09",
   };
-
-  const canonicalizedQueryString = Object.keys(parameters)
-    .sort()
-    .map((key) => `${percentEncode(key)}=${percentEncode(parameters[key])}`)
-    .join("&");
-
-  const stringToSign = `GET&${percentEncode("/")}&${percentEncode(canonicalizedQueryString)}`;
-  const signature = hmacSha1Base64(`${account.accessKeySecret}&`, stringToSign);
-
-  return `${API_ENDPOINT}?Signature=${percentEncode(signature)}&${canonicalizedQueryString}`;
+  const qs = Object.keys(p).sort().map((k) => `${enc(k)}=${enc(p[k])}`).join("&");
+  const toSign = `GET&${enc("/")}&${enc(qs)}`;
+  return `${API}?Signature=${enc(b64(hmacSha1(account.accessKeySecret + "&", toSign)))}&${qs}`;
 }
+
+/* ---------- 紧凑 SHA-1 / HMAC-SHA1 / Base64（纯 JS，兼容所有引擎） ---------- */
+
+const utf8 = (s) => [...unescape(encodeURIComponent(String(s)))].map((c) => c.charCodeAt(0));
+
+function sha1(m) {
+  const len = m.length * 8;
+  m = m.concat([0x80]);
+  while (m.length % 64 !== 56) m.push(0);
+  for (let i = 7; i >= 0; i--) m.push((len / 2 ** (8 * i)) & 0xff);
+  const rol = (v, n) => ((v << n) | (v >>> (32 - n))) >>> 0;
+  let h = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0];
+
+  for (let o = 0; o < m.length; o += 64) {
+    const w = new Array(80);
+    for (let i = 0; i < 16; i++)
+      w[i] = ((m[o + 4 * i] << 24) | (m[o + 4 * i + 1] << 16) | (m[o + 4 * i + 2] << 8) | m[o + 4 * i + 3]) >>> 0;
+    for (let i = 16; i < 80; i++) w[i] = rol(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1);
+
+    let [a, b, c, d, e] = h;
+    for (let i = 0; i < 80; i++) {
+      const f = i < 20 ? (b & c) | (~b & d) : i < 40 ? b ^ c ^ d : i < 60 ? (b & c) | (b & d) | (c & d) : b ^ c ^ d;
+      const k = i < 20 ? 0x5a827999 : i < 40 ? 0x6ed9eba1 : i < 60 ? 0x8f1bbcdc : 0xca62c1d6;
+      const t = (rol(a, 5) + f + e + k + w[i]) >>> 0;
+      e = d; d = c; c = rol(b, 30); b = a; a = t;
+    }
+    h = [(h[0] + a) >>> 0, (h[1] + b) >>> 0, (h[2] + c) >>> 0, (h[3] + d) >>> 0, (h[4] + e) >>> 0];
+  }
+  return h.flatMap((x) => [x >>> 24 & 0xff, x >>> 16 & 0xff, x >>> 8 & 0xff, x & 0xff]);
+}
+
+function hmacSha1(key, msg) {
+  let k = utf8(key);
+  if (k.length > 64) k = sha1(k);
+  while (k.length < 64) k.push(0);
+  const ipad = k.map((b) => b ^ 0x36);
+  const opad = k.map((b) => b ^ 0x5c);
+  return sha1(opad.concat(sha1(ipad.concat(utf8(msg)))));
+}
+
+function b64(b) {
+  const A = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  let s = "";
+  for (let i = 0; i < b.length; i += 3) {
+    const n = (b[i] << 16) | ((b[i + 1] || 0) << 8) | (b[i + 2] || 0);
+    s += A[(n >>> 18) & 63] + A[(n >>> 12) & 63]
+      + (i + 1 < b.length ? A[(n >>> 6) & 63] : "=")
+      + (i + 2 < b.length ? A[n & 63] : "=");
+  }
+  return s;
+}
+
+/* ---------- 请求与统计 ---------- */
 
 function httpGet(url) {
   return new Promise((resolve, reject) => {
-    $httpClient.get({ url, timeout: 15 }, (error, response, data) => {
-      if (error) {
-        return reject(new Error(String(error)));
-      }
-
-      const status = Number(response && response.status);
-      if (!status || status < 200 || status >= 300) {
-        return reject(new Error(`HTTP ${status || "未知"}: ${extractError(data)}`));
-      }
-
-      try {
-        resolve(JSON.parse(String(data || "{}")));
-      } catch (_) {
-        reject(new Error("阿里云返回了无法解析的数据"));
-      }
+    $httpClient.get({ url, timeout: 15 }, (err, resp, data) => {
+      if (err) return reject(new Error(String(err)));
+      const status = Number(resp && resp.status);
+      if (!status || status < 200 || status >= 300)
+        return reject(new Error(`HTTP ${status || "未知"}: ${errMsg(data)}`));
+      try { resolve(JSON.parse(String(data || "{}"))); }
+      catch { reject(new Error("阿里云返回了无法解析的数据")); }
     });
   });
 }
 
-function extractError(data) {
-  if (data && typeof data === "object") {
-    return data.Message || data.Code || "请求失败";
-  }
-
+const errMsg = (data) => {
   try {
-    const parsed = JSON.parse(String(data || "{}"));
-    return parsed.Message || parsed.Code || "请求失败";
-  } catch (_) {
-    return String(data || "请求失败").slice(0, 100);
-  }
-}
+    const o = typeof data === "object" && data ? data : JSON.parse(String(data || "{}"));
+    return o.Message || o.Code || "请求失败";
+  } catch { return String(data || "请求失败").slice(0, 100); }
+};
 
-/*
- * 阿里云 HTTPDNS 计费口径：
- *
- * HTTP  = 1x
- * HTTPS / DoH / DoT = 5x
- *
- * 注意：DescribePdnsRequestStatistic 返回的 HttpsCount
- * 已经包含 DoH 请求，因此这里不要再额外加 DohTotalCount。
- */
-function sumStatistics(statistics) {
-  return (Array.isArray(statistics) ? statistics : []).reduce(
-    (total, item) => {
-      const http =
-        item.HttpCount != null
-          ? number(item.HttpCount)
-          : number(item.V4HttpCount) + number(item.V6HttpCount);
+const num = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
 
-      const https =
-        item.HttpsCount != null
-          ? number(item.HttpsCount)
-          : number(item.V4HttpsCount) + number(item.V6HttpsCount);
-
-      total.http += http;
-      total.https += https;
-      return total;
-    },
-    { http: 0, https: 0 }
-  );
-}
-
-function number(value) {
-  const result = Number(value);
-  return Number.isFinite(result) ? result : 0;
-}
-
-async function queryAccount(account, range) {
-  const response = await httpGet(signedUrl(account, range.startDate, range.endDate));
-  const statistics = sumStatistics(response.Data);
-  const billable = statistics.http + statistics.https * 5;
-
-  return {
-    account,
-    usage: {
-      http: statistics.http,
-      https: statistics.https,
-      billable,
-    },
-  };
-}
-
-function displayAccountName(value) {
-  const name = String(value || "").trim();
-
-  // 11 位大陆手机号打码
-  if (/^1\d{10}$/.test(name)) {
-    return `${name.slice(0, 3)}****${name.slice(-4)}`;
-  }
-
-  return name;
-}
-
-function compactNumber(value) {
-  const numberValue = number(value);
-
-  if (numberValue >= 100000000) {
-    return `${trim(numberValue / 100000000)}亿`;
-  }
-
-  if (numberValue >= 10000) {
-    return `${trim(numberValue / 10000)}万`;
-  }
-
-  return Math.round(numberValue).toLocaleString("zh-CN");
-}
-
-function trim(value) {
-  return Number(
-    value.toFixed(value >= 100 ? 0 : value >= 10 ? 1 : 2)
-  ).toString();
-}
-
-/*
- * 5 格进度条，使用 ● / ○
- * 示例：
- *   0%    -> ○○○○○
- *   50%   -> ●●●○○
- *   100%  -> ●●●●●
- */
-function progressBar(percent) {
-  const total = 5;
-  const safePercent = Number.isFinite(percent)
-    ? Math.max(0, Math.min(100, percent))
-    : 0;
-
-  let filled = Math.round((safePercent / 100) * total);
-
-  // 有使用量时至少显示 1 格
-  if (safePercent > 0 && filled === 0) {
-    filled = 1;
-  }
-
-  return "●".repeat(filled) + "○".repeat(total - filled);
-}
-
-function formatPercent(value) {
-  if (!Number.isFinite(value)) {
-    return "0";
-  }
-
-  return value.toFixed(2).replace(/\.00$/, "");
-}
-
-function accountPanel(accountName, billable, quota) {
-  const percent = quota > 0 ? (billable / quota) * 100 : 0;
-  const bar = progressBar(percent);
-
-  if (billable > quota) {
-    const exceeded = billable - quota;
-    return `${accountName}  ${bar} ${formatPercent(percent)}%  超${compactNumber(exceeded)} ⚠️`;
-  }
-
-  const remaining = quota - billable;
-  return `${accountName}  ${bar} ${formatPercent(percent)}%  余${compactNumber(remaining)}`;
-}
-
-function panelDone(title, content, style = "info") {
-  $done({
-    title,
-    content,
-    icon: "cloud.fill",
-    "icon-color": style === "error" ? "#ff3b30" : "#ff6a00",
+function sumStats(data) {
+  const t = { http: 0, https: 0 };
+  (Array.isArray(data) ? data : []).forEach((x) => {
+    t.http += x.HttpCount != null ? num(x.HttpCount) : num(x.V4HttpCount) + num(x.V6HttpCount);
+    t.https += x.HttpsCount != null ? num(x.HttpsCount) : num(x.V4HttpsCount) + num(x.V6HttpsCount);
   });
+  return t;
 }
 
-/*
- * 纯 JavaScript SHA-1/HMAC 实现。
- * 凭证只用于构造签名并发送到阿里云，不会发给第三方。
- */
-function hmacSha1Base64(key, message) {
-  const blockSize = 64;
+/* ---------- 面板展示 ---------- */
 
-  let keyBytes = utf8Bytes(key);
+const mask = (n) => (/^1\d{10}$/.test(n) ? n.slice(0, 3) + "****" + n.slice(-4) : n);
 
-  if (keyBytes.length > blockSize) {
-    keyBytes = sha1Bytes(keyBytes);
-  }
+const compact = (v) =>
+  v >= 1e8 ? `${trim(v / 1e8)}亿`
+  : v >= 1e4 ? `${trim(v / 1e4)}万`
+  : Math.round(v).toLocaleString("zh-CN");
 
-  while (keyBytes.length < blockSize) {
-    keyBytes.push(0);
-  }
+const trim = (v) => Number(v.toFixed(v >= 100 ? 0 : v >= 10 ? 1 : 2)).toString();
 
-  const outer = keyBytes.map((byte) => byte ^ 0x5c);
-  const inner = keyBytes.map((byte) => byte ^ 0x36);
+const bar = (pct) => {
+  pct = Number.isFinite(pct) ? Math.max(0, Math.min(100, pct)) : 0;
+  let n = Math.round(pct / 20);
+  if (pct > 0 && n === 0) n = 1;   // 有使用量时至少 1 格
+  return "●".repeat(n) + "○".repeat(5 - n);
+};
 
-  return base64(
-    sha1Bytes(outer.concat(sha1Bytes(inner.concat(utf8Bytes(message)))))
-  );
-}
+const pct = (v) => (Number.isFinite(v) ? v.toFixed(2).replace(/\.00$/, "") : "0");
 
-function utf8Bytes(value) {
-  const encoded = unescape(encodeURIComponent(String(value)));
+const accountPanel = (name, billable) => {
+  const percent = QUOTA > 0 ? (billable / QUOTA) * 100 : 0;
+  const head = `${name}  ${bar(percent)} ${pct(percent)}%`;
+  return billable > QUOTA
+    ? `${head}  超${compact(billable - QUOTA)} ⚠️`
+    : `${head}  余${compact(QUOTA - billable)}`;
+};
 
-  return Array.from(encoded, (character) => character.charCodeAt(0));
-}
-
-function sha1Bytes(bytes) {
-  const message = bytes.slice();
-  const bitLength = message.length * 8;
-
-  message.push(0x80);
-
-  while (message.length % 64 !== 56) {
-    message.push(0);
-  }
-
-  const high = Math.floor(bitLength / 0x100000000);
-  const low = bitLength >>> 0;
-
-  for (let shift = 24; shift >= 0; shift -= 8) {
-    message.push((high >>> shift) & 0xff);
-  }
-
-  for (let shift = 24; shift >= 0; shift -= 8) {
-    message.push((low >>> shift) & 0xff);
-  }
-
-  let h0 = 0x67452301;
-  let h1 = 0xefcdab89;
-  let h2 = 0x98badcfe;
-  let h3 = 0x10325476;
-  let h4 = 0xc3d2e1f0;
-
-  for (let offset = 0; offset < message.length; offset += 64) {
-    const words = new Array(80);
-
-    for (let index = 0; index < 16; index += 1) {
-      const position = offset + index * 4;
-
-      words[index] =
-        (
-          (message[position] << 24) |
-          (message[position + 1] << 16) |
-          (message[position + 2] << 8) |
-          message[position + 3]
-        ) >>> 0;
-    }
-
-    for (let index = 16; index < 80; index += 1) {
-      words[index] =
-        rotateLeft(
-          words[index - 3] ^
-            words[index - 8] ^
-            words[index - 14] ^
-            words[index - 16],
-          1
-        );
-    }
-
-    let a = h0;
-    let b = h1;
-    let c = h2;
-    let d = h3;
-    let e = h4;
-
-    for (let index = 0; index < 80; index += 1) {
-      let f;
-      let k;
-
-      if (index < 20) {
-        f = (b & c) | (~b & d);
-        k = 0x5a827999;
-      } else if (index < 40) {
-        f = b ^ c ^ d;
-        k = 0x6ed9eba1;
-      } else if (index < 60) {
-        f = (b & c) | (b & d) | (c & d);
-        k = 0x8f1bbcdc;
-      } else {
-        f = b ^ c ^ d;
-        k = 0xca62c1d6;
-      }
-
-      const temp = (rotateLeft(a, 5) + f + e + k + words[index]) >>> 0;
-
-      e = d;
-      d = c;
-      c = rotateLeft(b, 30);
-      b = a;
-      a = temp;
-    }
-
-    h0 = (h0 + a) >>> 0;
-    h1 = (h1 + b) >>> 0;
-    h2 = (h2 + c) >>> 0;
-    h3 = (h3 + d) >>> 0;
-    h4 = (h4 + e) >>> 0;
-  }
-
-  return [h0, h1, h2, h3, h4].flatMap((word) => [
-    (word >>> 24) & 0xff,
-    (word >>> 16) & 0xff,
-    (word >>> 8) & 0xff,
-    word & 0xff,
-  ]);
-}
-
-function rotateLeft(value, bits) {
-  return ((value << bits) | (value >>> (32 - bits))) >>> 0;
-}
-
-function base64(bytes) {
-  const alphabet =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-  let output = "";
-
-  for (let index = 0; index < bytes.length; index += 3) {
-    const a = bytes[index];
-    const b = index + 1 < bytes.length ? bytes[index + 1] : 0;
-    const c = index + 2 < bytes.length ? bytes[index + 2] : 0;
-
-    const triple = (a << 16) | (b << 8) | c;
-
-    output += alphabet[(triple >>> 18) & 63];
-    output += alphabet[(triple >>> 12) & 63];
-    output += index + 1 < bytes.length ? alphabet[(triple >>> 6) & 63] : "=";
-    output += index + 2 < bytes.length ? alphabet[triple & 63] : "=";
-  }
-
-  return output;
-}
+/* ---------- 主流程 ---------- */
 
 (async () => {
-  if (!accounts.length) {
-    throw new Error("请在模块参数中分别填写账号名称、AccessKey ID 和 AccessKey Secret");
-  }
+  if (!ACCOUNTS.length) throw new Error("请在模块参数中填写账号名称、AccessKey ID 和 AccessKey Secret");
 
-  const range = monthRange();
+  const results = await Promise.allSettled(ACCOUNTS.map(async (a) => {
+    const s = sumStats((await httpGet(signedUrl(a))).Data);
+    return s.http + s.https * 5;   // 折算后的计费量
+  }));
 
-  const settled = await Promise.all(
-    accounts.map(async (account) => {
-      try {
-        const value = await queryAccount(account, range);
-        return { status: "fulfilled", value };
-      } catch (reason) {
-        return { status: "rejected", reason };
-      }
-    })
-  );
-
-  const accountBlocks = [];
-  let successCount = 0;
-
-  settled.forEach((result, index) => {
-    const account = accounts[index];
-    const displayName = displayAccountName(account.name);
-
-    if (result.status === "fulfilled") {
-      const usage = result.value.usage;
-      successCount += 1;
-      accountBlocks.push(accountPanel(displayName, usage.billable, monthlyQuota));
-    } else {
-      const reason =
-        result.reason && result.reason.message
-          ? result.reason.message
-          : String(result.reason);
-
-      accountBlocks.push(
-        [displayName, "查询失败", reason.slice(0, 80)].join("\n")
-      );
-    }
+  const lines = ACCOUNTS.map((a, i) => {
+    const name = mask(a.name.trim());
+    return results[i].status === "fulfilled"
+      ? accountPanel(name, results[i].value)
+      : [name, "查询失败", (results[i].reason.message || String(results[i].reason)).slice(0, 80)].join("\n");
   });
 
-  panelDone(
-    "阿里 HTTPDNS",
-    accountBlocks.join("\n\n"),
-    successCount ? "info" : "error"
-  );
-})().catch((error) => {
-  console.log(`[AliDNS Usage] ${error.message}`);
-
-  panelDone(
-    "阿里 HTTPDNS",
-    `更新失败：${error.message}`,
-    "error"
-  );
-});
+  const ok = results.some((r) => r.status === "fulfilled");
+  $done({ title: "阿里 HTTPDNS", content: lines.join("\n\n"), icon: "cloud.fill", "icon-color": ok ? "#ff6a00" : "#ff3b30" });
+})().catch((e) => {
+  console.log(`[AliDNS Usage] ${e.message}`);
+  $done({ title: "阿里 HTTPDNS", content: `更新失败：${e.message}`, icon: "cloud.fill", "icon-color": "#ff3b30" });
+  });
