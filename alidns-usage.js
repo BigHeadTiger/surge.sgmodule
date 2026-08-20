@@ -1,9 +1,9 @@
 /*!
- * AliDNS HTTPDNS 用量面板 · Surge Panel（优化版）
+ * AliDNS HTTPDNS 用量面板 · Surge Panel（精简版）
  * 数据源：DescribePdnsRequestStatistic（当月，北京时区）；计费：HTTP=1x HTTPS/DoH/DoT=5x UDP 默认不计
  * 参数：quota=10000000(全局额度,quotaN=单账号覆盖) https-factor=5 udp-factor=0 timeout=15 debug=1
  * 账号：name1=备注&id1=AccessKeyId&secret1=Secret[&quota1=额度]；旧格式 accounts=名称|ID|Secret;…
- * 每次运行输出一行结果日志（日志薄 → 脚本记录 → 详情）；debug=1 输出每账号明细
+ * 成功静默零日志；debug=1 输出统计区间/每账号明细/重试日志；出错时输出「更新失败」
  */
 "use strict";
 
@@ -61,13 +61,14 @@ function monthInfo(now) {
 }
 
 function signedUrl(account, range) {
+  const now = new Date();
   const p = {
     AccessKeyId: account.accessKeyId, Action: "DescribePdnsRequestStatistic",
     EndDate: range.end, Format: "JSON", Lang: "zh", Type: "ACCOUNT",
     SignatureMethod: "HMAC-SHA1",
-    SignatureNonce: `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`,
+    SignatureNonce: `${now.getTime()}-${Math.random().toString(36).slice(2, 12)}`,
     SignatureVersion: "1.0", StartDate: range.start,
-    Timestamp: new Date().toISOString().replace(/\.\d{3}Z$/, "Z"), Version: "2015-01-09",
+    Timestamp: now.toISOString().replace(/\.\d{3}Z$/, "Z"), Version: "2015-01-09",
   };
   const qs = Object.keys(p).sort().map((k) => `${enc(k)}=${enc(p[k])}`).join("&");
   return `${API}?Signature=${enc(b64(hmacSha1(account.accessKeySecret + "&", `GET&${enc("/")}&${enc(qs)}`)))}&${qs}`;
@@ -195,6 +196,7 @@ if (typeof Promise.allSettled !== "function")
     throw new Error("未配置账号：请在 Surge 中编辑本模块的参数，填写 name1/id1/secret1（或旧格式 accounts=名称|ID|Secret）");
 
   const info = monthInfo();
+  if (DEBUG) console.log(`[AliDNS] 统计区间 ${info.start} ~ ${info.end}（本月已过 ${info.elapsed} 天）`);
   const results = await Promise.allSettled(ACCOUNTS.map(async (a) => {
     const data = await httpJson(signedUrl(a, info));
     const s = sumStats(data && data.Data);
@@ -206,7 +208,6 @@ if (typeof Promise.allSettled !== "function")
   const ok = results.filter((r) => r.status === "fulfilled").length;
   const used = results.reduce((t, r) => t + (r.status === "fulfilled" ? r.value : 0), 0);
   const avg = compact(used / info.elapsed);
-  console.log(`[AliDNS] ${info.month}月 查询 ${ok}/${ACCOUNTS.length} · 日均 ${avg} · 已用 ${compact(used)}`);
 
   const blocks = ACCOUNTS.map((a, i) => accountBlock(a, results[i], info, ACCOUNTS.length > 1));
   const parts = [];
