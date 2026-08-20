@@ -1,12 +1,11 @@
-#!name=Meituan Log Drop
-#!desc=Reject-Drop Meituan logging and metrics domains
+#!name=Meituan Redirec
+#!desc=VPN环境下，错误解析修复。
 
-[Rule]
-DOMAIN,al-log.d.meituan.net,REJECT-DROP,pre-matching
-DOMAIN,al-log.dreport.meituan.net,REJECT-DROP,pre-matching
-DOMAIN,route-stats.d.meituan.net,REJECT-DROP,pre-matching
-DOMAIN,route-stats.dreport.meituan.net,REJECT-DROP,pre-matching
-DOMAIN,metrics-picture.d.meituan.net,REJECT-DROP,pre-matching
-DOMAIN,metrics-picture.dreport.meituan.net,REJECT-DROP,pre-matching
-DOMAIN,maplocatesdksnapshot.d.meituan.net,REJECT-DROP,pre-matching
-DOMAIN,maplocatesdksnapshot.dreport.meituan.net,REJECT-DROP,pre-matching
+[URL Rewrite]
+^http(s)?:\/\/(.*).d.meituan.net http$1://$2.dreport.meituan.net 302
+
+[Host]
+ntp.nasa.gov = time.nist.gov
+
+[MITM]
+hostname = %APPEND% al-log.d.meituan.net,route-stats.d.meituan.net,metrics-picture.d.meituan.net,maplocatesdksnapshot.d.meituan.net
