@@ -1,5 +1,5 @@
 #!name=AliDNS HTTPDNS 用量面板
-#!desc=Surge 面板：阿里云 HTTPDNS 当月用量（HTTP=1x，HTTPS/DoH/DoT=5x），含进度条、日均、月末预估与超额预警；凭据仅本地签名，直发阿里云。
+#!desc=Surge 面板：阿里云 HTTPDNS 当月用量（HTTP=1x，HTTPS/DoH/DoT=5x），显示日均消耗与已用用量，超额自动变色；凭据仅本地签名，直发阿里云。
 #!author=Minis · DeepSeek 重构版
 #!homepage=https://github.com/BigHeadTiger/surge.sgmodule
 #!system=ios
