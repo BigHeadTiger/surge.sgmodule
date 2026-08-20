@@ -98,7 +98,6 @@ function monthInfo(now) {
     end: fmt(Date.UTC(y, m, day)),
     month: m + 1,
     elapsed: day,
-    totalDays: new Date(Date.UTC(y, m + 1, 0)).getUTCDate(),
   };
 }
 
@@ -231,19 +230,7 @@ const compact = (v) =>
   : v >= 1e4 ? `${trim(v / 1e4)}万`
   : Math.round(v).toLocaleString("zh-CN");
 
-const pct = (v) => {
-  const s = v.toFixed(1);
-  return s.endsWith(".0") ? s.slice(0, -2) : s;
-};
-
-const bar = (p) => {
-  p = Number.isFinite(p) ? Math.max(0, Math.min(100, p)) : 0;
-  let n = Math.round(p / 20);
-  if (p > 0 && n === 0) n = 1;
-  return "●".repeat(n) + "○".repeat(5 - n);
-};
-
-// level: ok | warn(预估超) | over(已超) | error(失败)
+// 每账号两行：账号名 + 「日均 X · 已用 Y」；level: ok | over(已超) | error(失败)
 function accountBlock(a, r, info) {
   const name = maskName(a.name);
   if (r.status !== "fulfilled") {
@@ -251,27 +238,17 @@ function accountBlock(a, r, info) {
     return { text: `${name} ⚠️ 查询失败\n${msg}`, level: "error" };
   }
   const used = r.value;
-  const quota = a.quota;
-  const percent = used / quota * 100;
   const avg = used / info.elapsed;
-  const projected = avg * info.totalDays;
-  const rest = quota - used;
-  const head = `${name}  ${bar(percent)} ${pct(percent)}%${used > quota ? ` 超 ${compact(used - quota)} ⚠️` : ""}`;
-  const line2 = `已用 ${compact(used)}/${compact(quota)} · 余 ${compact(rest)}`;
-  const line3 = `日均 ${compact(avg)} · 预估月末 ${compact(projected)}${projected > quota ? " ⚠️" : ""}`;
   return {
-    text: [head, line2, line3].join("\n"),
-    level: used > quota ? "over" : projected > quota ? "warn" : "ok",
+    text: `${name}\n日均 ${compact(avg)} · 已用 ${compact(used)}`,
+    level: used > a.quota ? "over" : "ok",
   };
 }
 
-function summaryLine(accounts, results) {
-  let used = 0, quota = 0;
-  results.forEach((r, i) => {
-    quota += accounts[i].quota;               // 额度与查询成败无关
-    if (r.status === "fulfilled") used += r.value;
-  });
-  return `合计 ${compact(used)}/${compact(quota)} (${pct(used / quota * 100)}%) · 余 ${compact(quota - used)}`;
+function summaryLine(accounts, results, info) {
+  let used = 0;
+  results.forEach((r, i) => { if (r.status === "fulfilled") used += r.value; });
+  return `合计\n日均 ${compact(used / info.elapsed)} · 已用 ${compact(used)}`;
 }
 
 /* ---- 主流程 ---- */
@@ -306,11 +283,11 @@ if (typeof Promise.allSettled !== "function") {
   const blocks = ACCOUNTS.map((a, i) => accountBlock(a, results[i], info));
   const okCount = results.filter((r) => r.status === "fulfilled").length;
   const parts = [];
-  if (ACCOUNTS.length > 1) parts.push(summaryLine(ACCOUNTS, results));
+  if (ACCOUNTS.length > 1) parts.push(summaryLine(ACCOUNTS, results, info));
   parts.push(...blocks.map((b) => b.text));
 
   const color = okCount === 0 ? "#ff3b30"
-    : blocks.some((b) => b.level !== "ok") ? "#ff9f0a"
+    : blocks.some((b) => b.level !== "ok") ? "#ff9f0a"   // 任一账号超额/失败 → 橙色
     : "#34c759";
 
   $done({
