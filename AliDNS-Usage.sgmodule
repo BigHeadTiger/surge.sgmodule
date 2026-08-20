@@ -9,7 +9,7 @@
 #!arguments-desc=填写阿里云 AccessKey：id1=AccessKeyID，secret1=AccessKeySecret，仅保存在本设备。密钥含特殊字符请 URL 编码（+→%2B /→%2F =→%3D）。多账号请在模块 [Script] 行 argument 中追加 name2=备注&id2=…&secret2=…。
 
 [Panel]
-AliDNSUsage = title="阿里 HTTPDNS",script-name=AliDNSUsage,update-interval=1800
+AliDNSUsage = title="阿里 HTTPDNS",script-name=AliDNSUsage,update-interval=86400
 
 [Script]
 AliDNSUsage = type=generic,script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/main/alidns-usage.js,timeout=45,argument=quota={{{quota}}}&name1={{{name1}}}&id1={{{id1}}}&secret1={{{secret1}}}
