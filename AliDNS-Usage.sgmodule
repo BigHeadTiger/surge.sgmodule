@@ -1,15 +1,15 @@
 #!name=AliDNS HTTPDNS 用量面板
-#!desc=Surge 面板：阿里云 HTTPDNS 当月用量（HTTP=1x，HTTPS/DoH/DoT=5x），含进度条、日均、月末预估与超额预警；支持多账号汇总与单账号额度。凭据仅本地签名，直发阿里云。
+#!desc=Surge 面板：阿里云 HTTPDNS 当月用量（HTTP=1x，HTTPS/DoH/DoT=5x），含进度条、日均、月末预估与超额预警；凭据仅本地签名，直发阿里云。
 #!author=Minis · DeepSeek 重构版
 #!homepage=https://github.com/BigHeadTiger/surge.sgmodule
 #!system=ios
 #!tags=panel,aliyun,httpdns,usage
 #!icon=cloud.fill
-#!arguments=quota:10000000,name1:主账号,id1,secret1,name2,id2,secret2,name3,id3,secret3
-#!arguments-desc=阿里云 AccessKey 仅保存在本设备，不会上传。填 id1/secret1 即可，多账号顺延 name2/id2/secret2；密钥含特殊字符请 URL 编码（+→%2B /→%2F =→%3D）；不需要的账号留空。
+#!arguments=quota:10000000,name1:主账号,id1,secret1
+#!arguments-desc=填写阿里云 AccessKey：id1=AccessKeyID，secret1=AccessKeySecret，仅保存在本设备。密钥含特殊字符请 URL 编码（+→%2B /→%2F =→%3D）。多账号请在模块 [Script] 行 argument 中追加 name2=备注&id2=…&secret2=…。
 
 [Panel]
 AliDNSUsage = title="阿里 HTTPDNS",script-name=AliDNSUsage,update-interval=1800
 
 [Script]
-AliDNSUsage = type=generic,script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/main/alidns-usage.js,timeout=45,argument=quota={{{quota}}}&name1={{{name1}}}&id1={{{id1}}}&secret1={{{secret1}}}&name2={{{name2}}}&id2={{{id2}}}&secret2={{{secret2}}}&name3={{{name3}}}&id3={{{id3}}}&secret3={{{secret3}}}
+AliDNSUsage = type=generic,script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/main/alidns-usage.js,timeout=45,argument=quota={{{quota}}}&name1={{{name1}}}&id1={{{id1}}}&secret1={{{secret1}}}
