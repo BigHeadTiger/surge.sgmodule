@@ -1,17 +1,10 @@
 #!name=美团 代理检测绕过
-#!desc=绕过美团 app 的代理/VPN 检测：真实 DNS、直连、遥测域名重定向。需开启 MITM。
+#!desc=绕过美团 app 的代理/VPN 检测：真实 DNS(always-real-ip)、直连。需在 Surge 内开启。
 
 [General]
-always-real-ip = %APPEND% meituan.com, *.meituan.com, meituan.net, *.meituan.net, dianping.com, *.dianping.com
-skip-proxy = %APPEND% meituan.com, *.meituan.com, meituan.net, *.meituan.net, dianping.com, *.dianping.com
+always-real-ip = %APPEND% meituan.com, *.meituan.com, meituan.net, *.meituan.net
+skip-proxy = %APPEND% meituan.com, *.meituan.com, meituan.net, *.meituan.net
 
 [Rule]
 DOMAIN-SUFFIX,meituan.com,DIRECT
 DOMAIN-SUFFIX,meituan.net,DIRECT
-DOMAIN-SUFFIX,dianping.com,DIRECT
-
-[URL Rewrite]
-^(https?)://([^/?]+)\.d\.meituan\.net(/.*)?$ $1://$2.dreport.meituan.net$3 header
-
-[MITM]
-hostname = %APPEND% *.d.meituan.net
