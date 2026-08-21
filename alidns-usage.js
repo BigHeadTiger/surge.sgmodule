@@ -218,10 +218,10 @@ if (typeof Promise.allSettled !== "function")
   $done({
     title: `阿里 HTTPDNS · ${info.month}月`,
     content: parts.filter(Boolean).join("\n\n"),
-    icon: "cloud.fill",
+    icon: "network",
     "icon-color": color,
   });
 })().catch((e) => {
   console.log(`[AliDNS] 更新失败：${e.message}`);
-  $done({ title: "阿里 HTTPDNS", content: `更新失败：${e.message}`, icon: "cloud.fill", "icon-color": "#ff3b30" });
+  $done({ title: "阿里 HTTPDNS", content: `更新失败：${e.message}`, icon: "network", "icon-color": "#ff3b30" });
 });
