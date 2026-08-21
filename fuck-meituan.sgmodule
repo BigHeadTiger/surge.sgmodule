@@ -1,11 +1,17 @@
-#!name=Meituan Redirec
-#!desc=VPN环境下，错误解析修复。
+#!name=美团 代理检测绕过
+#!desc=绕过美团 app 的代理/VPN 检测：真实 DNS、直连、遥测域名重定向。需开启 MITM。
+
+[General]
+always-real-ip = %APPEND% meituan.com, *.meituan.com, meituan.net, *.meituan.net, dianping.com, *.dianping.com
+skip-proxy = %APPEND% meituan.com, *.meituan.com, meituan.net, *.meituan.net, dianping.com, *.dianping.com
+
+[Rule]
+DOMAIN-SUFFIX,meituan.com,DIRECT
+DOMAIN-SUFFIX,meituan.net,DIRECT
+DOMAIN-SUFFIX,dianping.com,DIRECT
 
 [URL Rewrite]
-^http(s)?:\/\/(.*).d.meituan.net http$1://$2.dreport.meituan.net 302
-
-[Host]
-ntp.nasa.gov = time.nist.gov
+^(https?)://([^/?]+)\.d\.meituan\.net(/.*)?$ $1://$2.dreport.meituan.net$3 header
 
 [MITM]
-hostname = %APPEND% al-log.d.meituan.net,route-stats.d.meituan.net,metrics-picture.d.meituan.net,maplocatesdksnapshot.d.meituan.net
+hostname = %APPEND% *.d.meituan.net
