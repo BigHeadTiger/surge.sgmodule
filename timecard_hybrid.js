@@ -1,16 +1,8 @@
-/* 节假日信息 v5.0 —— 混合版（在线查节假日 + 离线算农历）
- *
- * 设计：
- *   1) 在线层：$httpClient 调 timor.tech 全年假期接口，拿当年所有放假日 + 名称，
- *      本地用原生 Date 算出「距最近一个节假日 X 天」。彻底取代硬编码 HOLIDAYS 表。
- *   2) 离线层：solar2lunar() 农历换算（保留那张不可压缩的小数据表），提供农历/干支/生肖/星座。
- *   3) 兜底：在线失败时回退到内置节假日常用表，保证断网也能用。
- *   4) 当天为节假日 → persistentStore 去重发通知；图标按剩余天数切换。
- */
+/* 节假日信息 v5.1 —— 精简版（注释与死代码已去除）
+   节假日：在线读 GitHub NateScarlet/holiday-cn（国务院官方数据，免费无key），成功拉取后缓存进 $persistentStore，断网也能显示。
+   农历：离线计算（干支/生肖/星座）。 */
 
-// ========== 一、农历换算（保留完整功能，仅保留被用到的 solar2lunar 依赖链） ==========
-// NOTE: 下方两大表由 build_hybrid.js 注入
-
+// ========== 农历（离线） ==========
 const LUNAR_INFO = [0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2,//1900-1909
         0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977,//1910-1919
         0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970,//1920-1929
@@ -26,13 +18,12 @@ const LUNAR_INFO = [0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x1655
         0x07954, 0x06aa0, 0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260, 0x0ea65, 0x0d530,//2020-2029
         0x05aa0, 0x076a3, 0x096d0, 0x04afb, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520, 0x0dd45,//2030-2039
         0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0,//2040-2049
-        /**Add By JJonline@JJonline.Cn**/
         0x14b63, 0x09370, 0x049f8, 0x04970, 0x064b0, 0x168a6, 0x0ea50, 0x06b20, 0x1a6c4, 0x0aae0,//2050-2059
         0x092e0, 0x0d2e3, 0x0c960, 0x0d557, 0x0d4a0, 0x0da50, 0x05d55, 0x056a0, 0x0a6d0, 0x055d4,//2060-2069
         0x052d0, 0x0a9b8, 0x0a950, 0x0b4a0, 0x0b6a6, 0x0ad50, 0x055a0, 0x0aba4, 0x0a5b0, 0x052b0,//2070-2079
         0x0b273, 0x06930, 0x07337, 0x06aa0, 0x0ad50, 0x14b55, 0x04b60, 0x0a570, 0x054e4, 0x0d160,//2080-2089
         0x0e968, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252,//2090-2099
-        0x0d520];      // 1900-2100 每年数据（201 个十六进制数）
+        0x0d520];
 const STAR_TERM_INFO = ['9778397bd097c36b0b6fc9274c91aa', '97b6b97bd19801ec9210c965cc920e', '97bcf97c3598082c95f8c965cc920f',
         '97bd0b06bdb0722c965ce1cfcc920f', 'b027097bd097c36b0b6fc9274c91aa', '97b6b97bd19801ec9210c965cc920e',
         '97bcf97c359801ec95f8c965cc920f', '97bd0b06bdb0722c965ce1cfcc920f', 'b027097bd097c36b0b6fc9274c91aa',
@@ -99,7 +90,7 @@ const STAR_TERM_INFO = ['9778397bd097c36b0b6fc9274c91aa', '97b6b97bd19801ec9210c
         '665f67f0e37f14898082b0723b02d5', '7ec967f0e37f14998082b0787b06bd', '7f07e7f0e47f531b0723b0b6fb0721',
         '7f0e36665b66a449801e9808297c35', '665f67f0e37f14898082b072297c35', '7ec967f0e37f14998082b0787b06bd',
         '7f07e7f0e47f531b0723b0b6fb0721', '7f0e26665b66a449801e9808297c35', '665f67f0e37f1489801eb072297c35',
-        '7ec967f0e37f14998082b0787b06bd', '7f07e7f0e47f531b0723b0b6fb0721', '7f0e27f1487f531b0b0bb0b6fb0722']; // 节气信息表（200 段）
+        '7ec967f0e37f14998082b0787b06bd', '7f07e7f0e47f531b0723b0b6fb0721', '7f0e27f1487f531b0b0bb0b6fb0722'];
 
 const nStr1 = ["日", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
 const nStr2 = ["初", "十", "廿", "卅"];
@@ -107,38 +98,22 @@ const nStr3 = ["正", "二", "三", "四", "五", "六", "七", "八", "九", "�
 const Gan = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
 const Zhi = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
 const Animals = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
-const solarMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-const solarTerm = ["小寒", "大寒", "立春", "雨水", "惊蛰", "春分", "清明", "谷雨",
-  "立夏", "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑",
-  "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至"];
-const festival = {}; // 阳历节日表（仅装饰用途，未在面板拼接）
-const lFestival = {}; // 农历节日表（仅装饰用途）
 
-// —— 农历工具函数 ——
 function lYearDays(y) {
   let i, sum = 348;
   for (i = 0x8000; i > 0x8; i >>= 1) sum += (LUNAR_INFO[y - 1900] & i) ? 1 : 0;
   return sum + leapDays(y);
 }
 function leapMonth(y) { return LUNAR_INFO[y - 1900] & 0xf; }
-function leapDays(y) {
-  if (leapMonth(y)) return (LUNAR_INFO[y - 1900] & 0x10000) ? 30 : 29;
-  return 0;
-}
+function leapDays(y) { return (leapMonth(y)) ? (LUNAR_INFO[y - 1900] & 0x10000 ? 30 : 29) : 0; }
 function monthDays(y, m) { return (LUNAR_INFO[y - 1900] & (0x10000 >> m)) ? 30 : 29; }
-function solarDays(y, m) {
-  if (m === 2) { const d = (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0 ? 29 : 28; return d; }
-  return solarMonth[m - 1];
-}
 function toGanZhiYear(lYear) { return Gan[(lYear - 4) % 10] + Zhi[(lYear - 4) % 12]; }
 function toAstro(m, d) {
   const s = "摩羯水瓶双鱼白羊金牛双子巨蟹狮子处女天秤天蝎射手摩羯";
   const arr = [20, 19, 21, 21, 21, 22, 23, 23, 23, 23, 22, 22];
   return s.substr(m * 2 - (d < arr[m - 1] ? 2 : 0), 2) + "座";
 }
-function toGanZhi(offset) {
-  return Gan[offset % 10] + Zhi[offset % 12];
-}
+function toGanZhi(offset) { return Gan[offset % 10] + Zhi[offset % 12]; }
 function getTerm(y, n) {
   if (y < 1900 || y > 2100 || n < 1 || n > 24) return -1;
   const table = STAR_TERM_INFO[y - 1900];
@@ -149,10 +124,7 @@ function getTerm(y, n) {
   }
   return parseInt(calcDay[n - 1]);
 }
-function toChinaMonth(m) {
-  if (m > 10) return nStr3[m - 10] + "月";
-  return nStr3[m - 1] + "月";
-}
+function toChinaMonth(m) { return (m > 10 ? nStr3[m - 10] : nStr3[m - 1]) + "月"; }
 function toChinaDay(d) {
   switch (d) {
     case 10: return "初十"; case 20: return "二十"; case 30: return "三十";
@@ -162,7 +134,6 @@ function toChinaDay(d) {
 }
 function getAnimal(y) { return Animals[(y - 4) % 12]; }
 
-// —— 核心换算：公历 → 农历对象 ——
 function solar2lunar(yPara, mPara, dPara) {
   let y = parseInt(yPara), m = parseInt(mPara), d = parseInt(dPara);
   if (y < 1900 || y > 2100) return -1;
@@ -175,10 +146,6 @@ function solar2lunar(yPara, mPara, dPara) {
   let offset = (Date.UTC(objDate.getFullYear(), objDate.getMonth(), objDate.getDate()) - Date.UTC(1900, 0, 31)) / 86400000;
   for (i = 1900; i < 2101 && offset > 0; i++) { temp = lYearDays(i); offset -= temp; }
   if (offset < 0) { offset += temp; i--; }
-  let isTodayObj = new Date(), isToday = false;
-  if (isTodayObj.getFullYear() === y && isTodayObj.getMonth() + 1 === m && isTodayObj.getDate() === d) isToday = true;
-  let nWeek = objDate.getDay(), cWeek = nStr1[nWeek];
-  if (nWeek === 0) nWeek = 7;
   const year = i;
   leap = leapMonth(i);
   let isLeap = false;
@@ -197,40 +164,23 @@ function solar2lunar(yPara, mPara, dPara) {
   const sm = m - 1;
   const gzY = toGanZhiYear(year);
   const firstNode = getTerm(y, m * 2 - 1);
-  const secondNode = getTerm(y, m * 2);
   let gzM = toGanZhi((y - 1900) * 12 + m + 11);
   if (d >= firstNode) gzM = toGanZhi((y - 1900) * 12 + m + 12);
-  let isTerm = false, Term = null;
-  if (firstNode === d) { isTerm = true; Term = solarTerm[m * 2 - 2]; }
-  if (secondNode === d) { isTerm = true; Term = solarTerm[m * 2 - 1]; }
   const dayCyclical = Date.UTC(y, sm, 1, 0, 0, 0, 0) / 86400000 + 25567 + 10;
   const gzD = toGanZhi(dayCyclical + d - 1);
   const astro = toAstro(m, d);
-  const solarDate = y + "-" + m + "-" + d;
-  const lunarDate = year + "-" + month + "-" + day;
-  const festivalDate = m + "-" + d;
-  let lunarFestivalDate = month + "-" + day;
-  if (month === 12 && day === 29 && monthDays(year, month) === 29) lunarFestivalDate = "12-30";
   return {
-    lYear: year, lMonth: month, lDay: day,
     Animal: getAnimal(year),
     IMonthCn: (isLeap ? "闰" : "") + toChinaMonth(month),
     IDayCn: toChinaDay(day),
-    cYear: y, cMonth: m, cDay: d,
+    cMonth: m, cDay: d,
     gzYear: gzY, gzMonth: gzM, gzDay: gzD,
-    isToday: isToday, isLeap: isLeap,
-    nWeek: nWeek, ncWeek: "星期" + cWeek,
-    isTerm: isTerm, Term: Term, astro: astro
+    astro: astro
   };
 }
 
-/* ================= 二、在线查节假日（GitHub 静态数据文件 + 本地缓存） =================
-   数据源：https://github.com/NateScarlet/holiday-cn
-   每个年份一个 JSON 文件，数据来自国务院官方文件（gov.cn），社区维护，免费无 key。
-   结构：{ year, days:[{ name, date, isOffDay }] }  isOffDay:true=放假 false=调休补班日。
-   拉取成功后整份缓存进 $persistentStore，断网也能靠缓存显示节假日。 */
-
-// 缓存键 + 兜底表（仅当在线查询和缓存都失败时使用，防完全空白）
+// 数据源（国务院官方文件的社区镜像，免费无 key）
+const BASE_URL = "https://raw.githubusercontent.com/NateScarlet/holiday-cn/master/";
 const HOL_CACHE_KEY = "timecard_holidays_v2";
 const FALLBACK_HOLIDAYS = [
   ["元旦", "2027-01-01"], ["春节", "2027-02-06"], ["元宵", "2027-02-20"],
@@ -238,16 +188,11 @@ const FALLBACK_HOLIDAYS = [
   ["中秋节", "2027-09-15"], ["国庆节", "2027-10-01"]
 ];
 
-function todayStr() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
 function daysUntil(dateStr) {
   const [y, m, d] = dateStr.split("-").map(Number);
   const now = new Date(); now.setHours(0, 0, 0, 0);
   return Math.round((new Date(y, m - 1, d) - now) / 86400000);
 }
-// 全年放假日 → 筛"今天及以后"，按名称聚类只留放假区间起点，按天数升序
 function buildUpcoming(list) {
   const upcoming = list
     .map(it => ({ name: it.name, date: it.date, days: daysUntil(it.date) }))
@@ -305,8 +250,6 @@ function notifyIfNeeded(upcoming) {
     `放假的第1天，好好休息吧！`
   );
 }
-
-const BASE_URL = "https://raw.githubusercontent.com/NateScarlet/holiday-cn/master/";
 function fetchDays(year) {
   const url = BASE_URL + year + ".json";
   return new Promise(resolve => {
@@ -320,10 +263,8 @@ function fetchDays(year) {
     });
   });
 }
-// 拉当前年 + 下一年（年末下一个节日可能已跨年），写入缓存
 async function loadHolidays() {
   const y = new Date().getFullYear();
-  // 优先读缓存（断网可用）
   const cached = $persistentStore.read(HOL_CACHE_KEY);
   if (cached) {
     try {
@@ -336,11 +277,9 @@ async function loadHolidays() {
   if (merged.length) $persistentStore.write(JSON.stringify(merged), HOL_CACHE_KEY);
   return merged;
 }
-// —— 主入口：优先在线+缓存，全失败或"当前年节日已过且无下一年数据"时回退兜底 ——
 async function main() {
   let list = await loadHolidays();
   let upcoming = buildUpcoming(list);
-  // 若 list 为空，或缓存里的节日都已过去且没拉到下一年数据 → 用兜底表
   if (!upcoming.length) {
     upcoming = buildUpcoming(FALLBACK_HOLIDAYS.map(h => ({ name: h[0], date: h[1] })));
   }
