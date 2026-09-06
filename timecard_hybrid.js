@@ -1,5 +1,5 @@
-/* 节假日信息 v5.2 —— 精简版
-   节假日：在线读 NateScarlet/holiday-cn（国务院官方数据，免费无key），成功拉取后缓存进 $persistentStore，断网也能显示。
+/* 节假日信息 v5.3 —— 精简版
+   节假日：在线读 NateScarlet/holiday-cn（国务院官方数据，免费无key），主源失败自动切换 CDN 镜像；缓存 7 天有效，断网退回旧缓存。
    农历：离线计算（干支/生肖/星座），兜底节假日按当年动态计算。 */
 
 const LUNAR_INFO = [0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2,//1900-1909
@@ -197,8 +197,12 @@ function lunar2solar(lunarYear, lunarMonth, lunarDay, isLeap) {
 function pad2(n) { return String(n).padStart(2, "0"); }
 function solarStr(ymd) { return ymd[0] + "-" + pad2(ymd[1]) + "-" + pad2(ymd[2]); }
 
-const BASE_URL = "https://raw.githubusercontent.com/NateScarlet/holiday-cn/master/";
+const BASE_URLS = [
+  "https://raw.githubusercontent.com/NateScarlet/holiday-cn/master/",
+  "https://cdn.jsdelivr.net/gh/NateScarlet/holiday-cn@master/",
+];
 const HOL_CACHE_KEY = "timecard_holidays_v2";
+const CACHE_TTL = 7 * 86400000;
 function fallbackHolidays() {
   const y = new Date().getFullYear();
   const out = [];
@@ -281,37 +285,45 @@ function notifyIfNeeded(upcoming) {
   );
 }
 function fetchDays(year) {
-  const url = BASE_URL + year + ".json";
-  return new Promise(resolve => {
-    $httpClient.get({ url, timeout: 8 }, (err, resp, data) => {
+  const tryFetch = i => new Promise(resolve => {
+    if (i >= BASE_URLS.length) return resolve(null);
+    $httpClient.get({ url: BASE_URLS[i] + year + ".json", timeout: 5 }, (err, resp, data) => {
       try {
-        if (err || !data) return resolve(null);
+        if (err || !data) return resolve(tryFetch(i + 1));
         const body = JSON.parse(data);
         const arr = (body.days || []).filter(d => d && d.isOffDay === true && d.date);
-        resolve(arr.map(d => ({ name: d.name, date: d.date })));
-      } catch (e) { resolve(null); }
+        resolve(arr.length ? arr.map(d => ({ name: d.name, date: d.date })) : tryFetch(i + 1));
+      } catch (e) { resolve(tryFetch(i + 1)); }
     });
   });
+  return tryFetch(0);
 }
 async function loadHolidays() {
   const y = new Date().getFullYear();
-  let cached = null;
+  let cached = null, fresh = false;
   const raw = $persistentStore.read(HOL_CACHE_KEY);
   if (raw) {
     try {
       const c = JSON.parse(raw);
-      if (Array.isArray(c) && c.length) cached = c;
+      if (Array.isArray(c)) cached = c; // 旧版数组格式，视为过期
+      else if (Array.isArray(c.data) && c.data.length) {
+        cached = c.data;
+        fresh = c.ts > 0 && Date.now() - c.ts < CACHE_TTL;
+      }
     } catch (e) {}
   }
-  // 缓存需覆盖到明年，否则重拉
-  if (cached) {
+  // 缓存需覆盖到明年且 7 天内，否则重拉
+  if (cached && fresh) {
     const maxYear = cached.reduce((mx, it) => Math.max(mx, parseInt(it.date.slice(0, 4))), 0);
     if (maxYear >= y + 1) return cached;
   }
   const [a, b] = await Promise.all([fetchDays(y), fetchDays(y + 1)]);
-  const merged = mergeByDate([...(cached || []), ...(a || []), ...(b || [])]);
-  if (merged.length) $persistentStore.write(JSON.stringify(merged), HOL_CACHE_KEY);
-  return merged;
+  if (a || b) {
+    const merged = mergeByDate([...(cached || []), ...(a || []), ...(b || [])]);
+    if (merged.length) $persistentStore.write(JSON.stringify({ ts: Date.now(), data: merged }), HOL_CACHE_KEY);
+    return merged;
+  }
+  return cached || [];
 }
 function mergeByDate(list) {
   const seen = new Set(), out = [];
