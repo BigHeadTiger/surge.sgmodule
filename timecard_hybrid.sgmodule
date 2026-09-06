@@ -11,4 +11,4 @@
 Timecard = title="节假日信息",script-name=Timecard,update-interval=21600
 
 [Script]
-Timecard = type=generic,timeout=15,script-path=https://raw.githubusercontent.com/你的用户名/surge.sgmodule/main/timecard_hybrid_final.js
+Timecard = type=generic,timeout=15,script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/refs/heads/main/timecard_hybrid.js
