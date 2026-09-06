@@ -455,10 +455,6 @@ async function main() {
   // ===== 耗时剖析 =====
   log(3, "总耗时: " + ((Date.now() - t0) / 1000).toFixed(3) + " 秒 (网络 " + tNet + "ms · 计算 " + tCalc + "ms · 渲染 " + tRender + "ms · 通知 " + tNotif + "ms)");
   log(3, "执行结束!");
-  try {
-    if (typeof $surge !== "undefined" && $surge.logbook && upcoming[0])
-      $surge.logbook("节假日信息: " + SOURCE_USED + " · " + upcoming[0].name + " " + (upcoming[0].days === 0 ? "今天" : upcoming[0].days + "天") + "后");
-  } catch (e) {}
   $done(result);
 }
 main();
