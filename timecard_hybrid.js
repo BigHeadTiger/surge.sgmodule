@@ -1,4 +1,4 @@
-/* 节假日信息 v5.3 —— 精简版
+/* 节假日信息 v5.4 —— 精简版
    节假日：在线读 NateScarlet/holiday-cn（国务院官方数据，免费无key），主源失败自动切换 CDN 镜像；缓存 7 天有效，断网退回旧缓存。
    农历：离线计算（干支/生肖/星座），兜底节假日按当年动态计算。 */
 
@@ -238,7 +238,7 @@ function buildUpcoming(list) {
     seen.add(it.name);
     dedup.push(it);
   }
-  return dedup.sort((a, b) => a.days - b.days);
+  return dedup;
 }
 function iconFor(days) {
   if (days <= 0) return "gift";
