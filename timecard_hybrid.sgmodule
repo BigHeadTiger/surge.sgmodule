@@ -4,10 +4,12 @@
 #!system=ios
 #!tags=panel,holiday,lunar
 #!icon=calendar
-#!version=5.4
+#!version=5.5
+#!arguments = LogLevel:"INFO"
+#!arguments-desc = LogLevel: [调试] 日志等级\n    ├ OFF: 关闭\n    ├ ERROR: ❌ 仅错误\n    ├ WARN: ⚠️ 错误+警告\n    ├ INFO: ℹ️ 错误+警告+信息（默认）\n    ├ DEBUG: 🅱️ 全部信息+调试详情\n    └ ALL: 全部\n选择脚本日志输出等级，低于所选等级的日志将全部输出。
 
 [Panel]
 Timecard-Hybrid = title="节假日信息",script-name=Timecard-Hybrid,update-interval=21600
 
 [Script]
-Timecard-Hybrid = type=generic,timeout=15,script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/refs/heads/main/timecard_hybrid.js
+Timecard-Hybrid = type=generic,timeout=15,script-path=https://raw.githubusercontent.com/BigHeadTiger/surge.sgmodule/refs/heads/main/timecard_hybrid.js,argument=LogLevel={{{LogLevel}}}
