@@ -1,8 +1,7 @@
-/* 节假日信息 v5.1 —— 精简版（注释与死代码已去除）
-   节假日：在线读 GitHub NateScarlet/holiday-cn（国务院官方数据，免费无key），成功拉取后缓存进 $persistentStore，断网也能显示。
-   农历：离线计算（干支/生肖/星座）。 */
+/* 节假日信息 v5.2 —— 精简版
+   节假日：在线读 NateScarlet/holiday-cn（国务院官方数据，免费无key），成功拉取后缓存进 $persistentStore，断网也能显示。
+   农历：离线计算（干支/生肖/星座），兜底节假日按当年动态计算。 */
 
-// ========== 农历（离线） ==========
 const LUNAR_INFO = [0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2,//1900-1909
         0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977,//1910-1919
         0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970,//1920-1929
@@ -124,11 +123,10 @@ function getTerm(y, n) {
   }
   return parseInt(calcDay[n - 1]);
 }
-function toChinaMonth(m) { return (m > 10 ? nStr3[m - 10] : nStr3[m - 1]) + "月"; }
+function toChinaMonth(m) { return nStr3[m - 1] + "月"; }
 function toChinaDay(d) {
   switch (d) {
     case 10: return "初十"; case 20: return "二十"; case 30: return "三十";
-    case 0: return "初一"; default:
   }
   return nStr2[Math.floor(d / 10)] + nStr1[d % 10];
 }
@@ -174,19 +172,51 @@ function solar2lunar(yPara, mPara, dPara) {
     IMonthCn: (isLeap ? "闰" : "") + toChinaMonth(month),
     IDayCn: toChinaDay(day),
     cMonth: m, cDay: d,
+    month: month, day: day, isLeap: isLeap,
     gzYear: gzY, gzMonth: gzM, gzDay: gzD,
     astro: astro
   };
 }
 
-// 数据源（国务院官方文件的社区镜像，免费无 key）
+// 农历→公历（兜底用），以 1900-01-31 春节为锚点
+function lunar2solar(lunarYear, lunarMonth, lunarDay, isLeap) {
+  let days = 0;
+  for (let i = 1900; i < lunarYear; i++) days += lYearDays(i);
+  const base = new Date(Date.UTC(1900, 0, 31) + days * 86400000);
+  const leap = leapMonth(lunarYear);
+  let offset = lunarDay - 1;
+  if (isLeap) {
+    for (let m = 1; m <= lunarMonth; m++) offset += monthDays(lunarYear, m);
+  } else {
+    for (let m = 1; m < lunarMonth; m++) offset += monthDays(lunarYear, m);
+    if (leap && lunarMonth > leap) offset += leapDays(lunarYear);
+  }
+  const d = new Date(base.getTime() + offset * 86400000);
+  return [d.getFullYear(), d.getMonth() + 1, d.getDate()];
+}
+function pad2(n) { return String(n).padStart(2, "0"); }
+function solarStr(ymd) { return ymd[0] + "-" + pad2(ymd[1]) + "-" + pad2(ymd[2]); }
+
 const BASE_URL = "https://raw.githubusercontent.com/NateScarlet/holiday-cn/master/";
 const HOL_CACHE_KEY = "timecard_holidays_v2";
-const FALLBACK_HOLIDAYS = [
-  ["元旦", "2027-01-01"], ["春节", "2027-02-06"], ["元宵", "2027-02-20"],
-  ["清明", "2027-04-05"], ["劳动节", "2027-05-01"], ["端午节", "2027-06-09"],
-  ["中秋节", "2027-09-15"], ["国庆节", "2027-10-01"]
-];
+function fallbackHolidays() {
+  const y = new Date().getFullYear();
+  const out = [];
+  for (const Y of [y, y + 1]) {
+    const qingming = getTerm(Y, 7); // 清明 = 第 7 节气（4 月）
+    out.push(
+      { name: "元旦", date: solarStr([Y, 1, 1]) },
+      { name: "春节", date: solarStr(lunar2solar(Y, 1, 1)) },
+      { name: "元宵", date: solarStr(lunar2solar(Y, 1, 15)) },
+      { name: "清明", date: solarStr([Y, 4, qingming]) },
+      { name: "劳动节", date: solarStr([Y, 5, 1]) },
+      { name: "端午节", date: solarStr(lunar2solar(Y, 5, 5)) },
+      { name: "中秋节", date: solarStr(lunar2solar(Y, 8, 15)) },
+      { name: "国庆节", date: solarStr([Y, 10, 1]) }
+    );
+  }
+  return out;
+}
 
 function daysUntil(dateStr) {
   const [y, m, d] = dateStr.split("-").map(Number);
@@ -265,23 +295,34 @@ function fetchDays(year) {
 }
 async function loadHolidays() {
   const y = new Date().getFullYear();
-  const cached = $persistentStore.read(HOL_CACHE_KEY);
-  if (cached) {
+  let cached = null;
+  const raw = $persistentStore.read(HOL_CACHE_KEY);
+  if (raw) {
     try {
-      const c = JSON.parse(cached);
-      if (Array.isArray(c) && c.length) return c;
+      const c = JSON.parse(raw);
+      if (Array.isArray(c) && c.length) cached = c;
     } catch (e) {}
   }
+  // 缓存需覆盖到明年，否则重拉
+  if (cached) {
+    const maxYear = cached.reduce((mx, it) => Math.max(mx, parseInt(it.date.slice(0, 4))), 0);
+    if (maxYear >= y + 1) return cached;
+  }
   const [a, b] = await Promise.all([fetchDays(y), fetchDays(y + 1)]);
-  const merged = [...(a || []), ...(b || [])];
+  const merged = mergeByDate([...(cached || []), ...(a || []), ...(b || [])]);
   if (merged.length) $persistentStore.write(JSON.stringify(merged), HOL_CACHE_KEY);
   return merged;
+}
+function mergeByDate(list) {
+  const seen = new Set(), out = [];
+  for (const it of list) { if (!seen.has(it.date)) { seen.add(it.date); out.push(it); } }
+  return out;
 }
 async function main() {
   let list = await loadHolidays();
   let upcoming = buildUpcoming(list);
   if (!upcoming.length) {
-    upcoming = buildUpcoming(FALLBACK_HOLIDAYS.map(h => ({ name: h[0], date: h[1] })));
+    upcoming = buildUpcoming(fallbackHolidays());
   }
   notifyIfNeeded(upcoming);
   $done(render(upcoming));
