@@ -347,4 +347,4 @@ async function main() {
   notifyIfNeeded(upcoming);
   $done(render(upcoming));
 }
-main();
+main(); 
