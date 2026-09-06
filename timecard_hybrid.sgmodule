@@ -4,8 +4,7 @@
 #!system=ios
 #!tags=panel,holiday,lunar
 #!icon=calendar
-#!modifiers=1
-#!version=3.6
+#!version=5.4
 
 [Panel]
 Timecard-Hybrid = title="节假日信息",script-name=Timecard-Hybrid,update-interval=21600
