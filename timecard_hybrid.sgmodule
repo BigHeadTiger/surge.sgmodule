@@ -1,0 +1,14 @@
+#!name=节假日信息
+#!desc=显示农历、干支、生肖与最近节假日倒计时。节假日数据在线读取 GitHub (NateScarlet/holiday-cn)，来源国务院官方文件，社区维护、免费无 key，成功拉取后本地缓存，断网也能靠缓存显示；农历/生肖离线计算。
+#!author=Minis
+#!system=ios
+#!tags=panel,holiday,lunar
+#!icon=calendar
+#!modifiers=1
+#!version=3.4
+
+[Panel]
+Timecard = title="节假日信息",script-name=Timecard,update-interval=21600
+
+[Script]
+Timecard = type=generic,timeout=15,script-path=https://raw.githubusercontent.com/你的用户名/surge.sgmodule/main/timecard_hybrid_final.js
