@@ -199,23 +199,20 @@ function solarStr(ymd) { return ymd[0] + "-" + pad2(ymd[1]) + "-" + pad2(ymd[2])
 
 const TC_VERSION = "5.7";
 let SOURCE_USED = "";      // 本次实际生效的数据源
-let FETCH_TRAIL = [];      // 抓取/重试轨迹
-let CACHE_INFO = { hit: false, count: 0, maxYear: 0, ageH: -1 };
 
 // ---- 日志分级（学 iRingo 的 LogLevel）----
 const LOG_LEVELS = { OFF: 0, ERROR: 1, WARN: 2, INFO: 3, DEBUG: 4, ALL: 5 };
-const DEFAULT_LEVEL = 3;   // 默认 INFO：正常运行时输出一行概要
-let LOG_LEVEL = DEFAULT_LEVEL;
+let LOG_LEVEL = 3; // 默认 INFO
 function parseLogLevel(arg) {
   const m = /(?:^|[&,;\s])LogLevel=([A-Za-z]+)/.exec(arg || "");
-  if (!m) return DEFAULT_LEVEL;
+  if (!m) return 3;
   const v = LOG_LEVELS[m[1].toUpperCase()];
-  return (v === undefined) ? DEFAULT_LEVEL : v;
+  return (v === undefined) ? 3 : v;
 }
 function log(level, ...args) {
   if (level <= LOG_LEVEL) console.log(args.join(" "));
 }
-function srcLabel(i) { return i === 0 ? "主源(GitHub raw)" : "镜像(jsDelivr)"; }
+function srcLabel(i) { return i === 0 ? "主源（GitHub raw）" : "镜像（jsDelivr）"; }
 const BASE_URLS = [
   "https://raw.githubusercontent.com/NateScarlet/holiday-cn/master/",
   "https://cdn.jsdelivr.net/gh/NateScarlet/holiday-cn@master/",
@@ -305,27 +302,17 @@ function notifyIfNeeded(upcoming) {
 function fetchDays(year) {
   const tryFetch = i => new Promise(resolve => {
     if (i >= BASE_URLS.length) return resolve(null);
-    const t0 = Date.now();
     $httpClient.get({ url: BASE_URLS[i] + year + ".json", timeout: 5 }, (err, resp, data) => {
-      const ms = Date.now() - t0;
-      const status = resp ? resp.status : -1;
-      const tag = year + " " + srcLabel(i);
       try {
-        if (err || !data) {
-          FETCH_TRAIL.push(`${tag} ❌ ${err || ("HTTP " + status)} (${ms}ms)`);
-          return resolve(tryFetch(i + 1));
-        }
+        if (err || !data) return resolve(tryFetch(i + 1));
         const body = JSON.parse(data);
         const arr = (body.days || []).filter(d => d && d.isOffDay === true && d.date);
         if (arr.length) {
           SOURCE_USED = srcLabel(i);
-          FETCH_TRAIL.push(`${tag} ✅ ${arr.length}条 · ${(data.length / 1024).toFixed(1)}KB · ${ms}ms`);
           return resolve(arr.map(d => ({ name: d.name, date: d.date })));
         }
-        FETCH_TRAIL.push(`${tag} ⚠️ 空数据 (${ms}ms)`);
         resolve(tryFetch(i + 1));
       } catch (e) {
-        FETCH_TRAIL.push(`${tag} ❌ 解析异常 ${e.message} (${ms}ms)`);
         resolve(tryFetch(i + 1));
       }
     });
@@ -334,7 +321,7 @@ function fetchDays(year) {
 }
 async function loadHolidays() {
   const y = new Date().getFullYear();
-  let cached = null, fresh = false, cacheTS = 0;
+  let cached = null, fresh = false;
   const raw = $persistentStore.read(HOL_CACHE_KEY);
   if (raw) {
     try {
@@ -343,23 +330,18 @@ async function loadHolidays() {
       else if (Array.isArray(c.data) && c.data.length) {
         cached = c.data;
         fresh = c.ts > 0 && Date.now() - c.ts < CACHE_TTL;
-        cacheTS = c.ts > 0 ? c.ts : 0;
       }
-    } catch (e) { log(2, "缓存解析异常:", e.message); }
+    } catch (e) {}
   }
+  let maxYear = 0;
   if (cached) {
-    CACHE_INFO.hit = true;
-    CACHE_INFO.count = cached.length;
-    CACHE_INFO.maxYear = cached.reduce((mx, it) => {
+    maxYear = cached.reduce((mx, it) => {
       const yy = (it && typeof it.date === "string" && it.date.length >= 4) ? parseInt(it.date.slice(0, 4)) : 0;
       return Math.max(mx, isNaN(yy) ? 0 : yy);
     }, 0);
-    CACHE_INFO.ageH = cacheTS ? (Date.now() - cacheTS) / 3600000 : -1;
   }
   // 缓存需覆盖到明年且 7 天内，否则重拉
-  if (cached && fresh) {
-    if (CACHE_INFO.maxYear >= y + 1) { SOURCE_USED = "本地缓存 (7天内有效)"; return cached; }
-  }
+  if (cached && fresh && maxYear >= y + 1) { SOURCE_USED = "本地缓存"; return cached; }
   const [a, b] = await Promise.all([fetchDays(y), fetchDays(y + 1)]);
   if (a || b) {
     const merged = mergeByDate([...(cached || []), ...(a || []), ...(b || [])]);
@@ -374,35 +356,34 @@ function mergeByDate(list) {
   for (const it of list) { if (!seen.has(it.date)) { seen.add(it.date); out.push(it); } }
   return out;
 }
+function triggerLine() {
+  try {
+    const t = (typeof $trigger !== "undefined") ? $trigger : "";
+    const map = { editor: "脚本编辑器", "http-api": "HTTP API", intent: "快捷指令", button: "手动点击面板", "auto-interval": "定时刷新" };
+    return t ? (map[t] || t) : "";
+  } catch (e) { return ""; }
+}
 async function main() {
   LOG_LEVEL = parseLogLevel(typeof $argument !== "undefined" ? $argument : "");
 
-  // ===== 数据源 =====
-  let tNet = Date.now();
+  log(3, "触发方式：" + triggerLine());
+
   let list = await loadHolidays();
-  tNet = Date.now() - tNet;
   let upcoming = buildUpcoming(list);
+  let mode = "在线数据";
   if (!upcoming.length) {
     upcoming = buildUpcoming(fallbackHolidays());
     SOURCE_USED = "离线兜底计算";
-    log(1, "⚠️ 数据源不可用，已切离线兜底" + (FETCH_TRAIL.length ? " · " + FETCH_TRAIL.join(" | ") : ""));
+    mode = "离线兜底";
   }
+  log(3, "数据源：" + SOURCE_USED);
+  log(3, "运行模式：" + mode);
 
-  // ===== 计算 =====
-  let lunar;
-  try {
-    lunar = solar2lunar();
-  } catch (e) {
-    log(1, "❌ 农历计算失败: " + e.message);
-    lunar = { IMonthCn: "", IDayCn: "", gzDay: "", gzYear: "", gzMonth: "", Animal: "", astro: "", isLeap: false, cMonth: "", cDay: "" };
-  }
-
-  // ===== 通知 =====
+  const lunar = solar2lunar();
   notifyIfNeeded(upcoming);
-
-  // ===== 渲染 =====
   const result = render(upcoming, lunar);
-  log(3, "ℹ️ " + SOURCE_USED + " | 网络 " + tNet + "ms | " + result.title);
+
+  log(3, "执行结束！");
   $done(result);
 }
 main();
