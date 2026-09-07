@@ -1,4 +1,4 @@
-/* 节假日信息 v5.5 —— 精简版
+/* 节假日信息 v5.7 —— 精简版
    节假日：在线读 NateScarlet/holiday-cn（国务院官方数据，免费无key），主源失败自动切换 CDN 镜像；缓存 7 天有效，断网退回旧缓存。
    农历：离线计算（干支/生肖/星座），兜底节假日按当年动态计算。 */
 
@@ -197,19 +197,20 @@ function lunar2solar(lunarYear, lunarMonth, lunarDay, isLeap) {
 function pad2(n) { return String(n).padStart(2, "0"); }
 function solarStr(ymd) { return ymd[0] + "-" + pad2(ymd[1]) + "-" + pad2(ymd[2]); }
 
-const TC_VERSION = "5.6";
+const TC_VERSION = "5.7";
 let SOURCE_USED = "";      // 本次实际生效的数据源
 let FETCH_TRAIL = [];      // 抓取/重试轨迹
 let CACHE_INFO = { hit: false, count: 0, maxYear: 0, ageH: -1 };
 
 // ---- 日志分级（学 iRingo 的 LogLevel）----
 const LOG_LEVELS = { OFF: 0, ERROR: 1, WARN: 2, INFO: 3, DEBUG: 4, ALL: 5 };
-let LOG_LEVEL = 2; // 默认 WARN：平时完全静默，仅异常（缓存损坏/数据源全挂/计算失败）时输出
+const DEFAULT_LEVEL = 3;   // 默认 INFO：正常运行时输出一行概要
+let LOG_LEVEL = DEFAULT_LEVEL;
 function parseLogLevel(arg) {
   const m = /(?:^|[&,;\s])LogLevel=([A-Za-z]+)/.exec(arg || "");
-  if (!m) return 2;
+  if (!m) return DEFAULT_LEVEL;
   const v = LOG_LEVELS[m[1].toUpperCase()];
-  return (v === undefined) ? 2 : v;
+  return (v === undefined) ? DEFAULT_LEVEL : v;
 }
 function log(level, ...args) {
   if (level <= LOG_LEVEL) console.log(args.join(" "));
@@ -381,15 +382,10 @@ async function main() {
   let list = await loadHolidays();
   tNet = Date.now() - tNet;
   let upcoming = buildUpcoming(list);
-  let mode = "在线数据";
   if (!upcoming.length) {
     upcoming = buildUpcoming(fallbackHolidays());
-    SOURCE_USED = "离线兜底计算 (本地农历计算)";
-    mode = "离线兜底";
-    log(1, "⚠️ 数据源不可用，已切换离线兜底计算 (网络耗时 " + tNet + "ms)");
-  }
-  if (mode === "离线兜底" && FETCH_TRAIL.length) {
-    log(2, "数据源全挂，抓取轨迹: " + FETCH_TRAIL.join(" | "));
+    SOURCE_USED = "离线兜底计算";
+    log(1, "⚠️ 数据源不可用，已切离线兜底" + (FETCH_TRAIL.length ? " · " + FETCH_TRAIL.join(" | ") : ""));
   }
 
   // ===== 计算 =====
@@ -406,6 +402,7 @@ async function main() {
 
   // ===== 渲染 =====
   const result = render(upcoming, lunar);
+  log(3, "ℹ️ " + SOURCE_USED + " | 网络 " + tNet + "ms | " + result.title);
   $done(result);
 }
 main();
