@@ -1,6 +1,6 @@
-/* 节假日信息 v5.7 —— 精简版
-   节假日：在线读 NateScarlet/holiday-cn（国务院官方数据，免费无key），主源失败自动切换 CDN 镜像；缓存 7 天有效，断网退回旧缓存。
-   农历：离线计算（干支/生肖/星座），兜底节假日按当年动态计算。 */
+/* 节假日信息 v5.8
+   在线：NateScarlet/holiday-cn（国务院公告数据），主源失败切 CDN 镜像，7 天缓存，断网兜底。
+   离线：农历/干支/星座本地计算。 */
 
 const LUNAR_INFO = [0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2,//1900-1909
         0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977,//1910-1919
@@ -197,20 +197,19 @@ function lunar2solar(lunarYear, lunarMonth, lunarDay, isLeap) {
 function pad2(n) { return String(n).padStart(2, "0"); }
 function solarStr(ymd) { return ymd[0] + "-" + pad2(ymd[1]) + "-" + pad2(ymd[2]); }
 
-const TC_VERSION = "5.7";
-let SOURCE_USED = "";      // 本次实际生效的数据源
+let SOURCE_USED = "";
+let srcIdx = 0; // 实际用到的数据源最大索引（用于标注主源/镜像）
 
-// ---- 日志分级（学 iRingo 的 LogLevel）----
 const LOG_LEVELS = { OFF: 0, ERROR: 1, WARN: 2, INFO: 3, DEBUG: 4, ALL: 5 };
-let LOG_LEVEL = 3; // 默认 INFO
+let LOG_LEVEL = 3;
 function parseLogLevel(arg) {
-  const m = /(?:^|[&,;\s])LogLevel=([A-Za-z]+)/.exec(arg || "");
+  const m = /(?:^|[&,;\s])LogLevel[:=]([A-Za-z]+)/.exec(arg || "");
   if (!m) return 3;
   const v = LOG_LEVELS[m[1].toUpperCase()];
   return (v === undefined) ? 3 : v;
 }
-function log(level, ...args) {
-  if (level <= LOG_LEVEL) console.log(args.join(" "));
+function log(level, msg) {
+  if (level <= LOG_LEVEL) console.log(msg);
 }
 function srcLabel(i) { return i === 0 ? "主源（GitHub raw）" : "镜像（jsDelivr）"; }
 const BASE_URLS = [
@@ -308,7 +307,7 @@ function fetchDays(year) {
         const body = JSON.parse(data);
         const arr = (body.days || []).filter(d => d && d.isOffDay === true && d.date);
         if (arr.length) {
-          SOURCE_USED = srcLabel(i);
+          srcIdx = Math.max(srcIdx, i);
           return resolve(arr.map(d => ({ name: d.name, date: d.date })));
         }
         resolve(tryFetch(i + 1));
@@ -322,6 +321,7 @@ function fetchDays(year) {
 async function loadHolidays() {
   const y = new Date().getFullYear();
   let cached = null, fresh = false;
+  srcIdx = 0;
   const raw = $persistentStore.read(HOL_CACHE_KEY);
   if (raw) {
     try {
@@ -344,7 +344,9 @@ async function loadHolidays() {
   if (cached && fresh && maxYear >= y + 1) { SOURCE_USED = "本地缓存"; return cached; }
   const [a, b] = await Promise.all([fetchDays(y), fetchDays(y + 1)]);
   if (a || b) {
-    const merged = mergeByDate([...(cached || []), ...(a || []), ...(b || [])]);
+    SOURCE_USED = srcLabel(srcIdx);
+    // 新数据优先，旧缓存只填空缺（避免过期条目覆盖新日期）
+    const merged = mergeByDate([...(a || []), ...(b || []), ...(cached || [])]);
     if (merged.length) $persistentStore.write(JSON.stringify({ ts: Date.now(), data: merged }), HOL_CACHE_KEY);
     return merged;
   }
