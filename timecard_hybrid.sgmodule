@@ -4,9 +4,9 @@
 #!system=ios
 #!tags=panel,holiday,lunar
 #!icon=calendar
-#!version=5.5
-#!arguments = LogLevel:"INFO"
-#!arguments-desc = LogLevel: [调试] 日志等级\n    ├ OFF: 关闭\n    ├ ERROR: ❌ 仅错误\n    ├ WARN: ⚠️ 错误+警告\n    ├ INFO: ℹ️ 错误+警告+信息（默认）\n    ├ DEBUG: 🅱️ 全部信息+调试详情\n    └ ALL: 全部\n选择脚本日志输出等级，低于所选等级的日志将全部输出。
+#!version=5.6
+#!arguments = LogLevel:"WARN"
+#!arguments-desc = LogLevel: [调试] 日志等级\n    ├ OFF: 完全静默（不输出任何日志）\n    ├ ERROR: ❌ 仅错误（数据源全挂/计算失败）\n    ├ WARN: ⚠️ 错误+警告（默认，平时无输出，仅异常时留痕）\n    ├ INFO: ℹ️ 错误+警告+运行信息\n    ├ DEBUG: 🅱️ 全部信息+调试详情\n    └ ALL: 全部\n默认 WARN：正常运行时零日志，仅在数据源不可用/缓存损坏/计算失败等异常时输出错误行用于排查。若需临时查看完整运行日志，可将级别调高。
 
 [Panel]
 Timecard-Hybrid = title="节假日信息",script-name=Timecard-Hybrid,update-interval=21600
