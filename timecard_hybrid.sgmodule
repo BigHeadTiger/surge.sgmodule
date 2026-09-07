@@ -4,7 +4,7 @@
 #!system=ios
 #!tags=panel,holiday,lunar
 #!icon=calendar
-#!version=5.7
+#!version=5.8
 #!arguments=LogLevel:INFO
 #!arguments-desc=日志等级（写入脚本详情→日志）：OFF 静默 / ERROR / WARN / INFO 运行概要（默认）/ DEBUG / ALL
 
